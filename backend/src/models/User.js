@@ -66,3 +66,4 @@ userSchema.pre('save', async function(nest) {
     }
 })
 
+export default User
