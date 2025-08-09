@@ -3,7 +3,7 @@ import { Media } from '~/interfaces/media.schema'
 
 const mediaSchema = new mongoose.Schema<Media>(
   {
-    contextType: { type: String, enum: ['Post', 'Page', 'Group'], required: true },
+    contextType: { type: String, enum: ['Post', 'Page', 'Group', 'Comment', 'Message', 'ShortVideo'], required: true },
     contextId: { type: mongoose.Schema.Types.ObjectId, required: false },
     secureUrl: { type: String, required: true },
     folder: { type: String, required: true },

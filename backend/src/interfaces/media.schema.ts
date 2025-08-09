@@ -2,7 +2,7 @@ import { Types } from 'mongoose'
 
 export interface Media {
   _id?: Types.ObjectId
-  contextType: string
+  contextType: 'Post' | 'Page' | 'Group' | 'Comment' | 'Message' | 'ShortVideo' | 'Conversation' // Post, Page, Group, Comment, Message, ShortVideo
   contextId?: Types.ObjectId
   secureUrl: string
   folder: string

@@ -4,7 +4,7 @@ export interface Post {
   _id?: Types.ObjectId
   title: string
   content: string
-  contextType: string // group, page, personal
+  contextType: 'Group' | 'Page' | 'Personal' // group, page, personal
   contextId?: Types.ObjectId // groupId, pageId
   createdBy: Types.ObjectId
   likesCount: number
