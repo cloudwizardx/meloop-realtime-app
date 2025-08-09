@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import { Profile } from '~/interfaces/profile.schema'
 import { COVER_PHOTO_DEFAULT } from '~/utils/app.constant'
 
-export const profileSchema = new mongoose.Schema<Profile>(
+const profileSchema = new mongoose.Schema<Profile>(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -27,3 +27,4 @@ export const profileSchema = new mongoose.Schema<Profile>(
   { timestamps: true }
 )
 
+export default mongoose.model<Profile>('Profile', profileSchema)

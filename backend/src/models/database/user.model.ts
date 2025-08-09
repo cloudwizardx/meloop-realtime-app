@@ -1,0 +1,18 @@
+import mongoose from 'mongoose'
+import { User } from '~/interfaces/user.schema'
+
+const userSchema = new mongoose.Schema<User>(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    isEmailVerified: { type: Boolean, required: true },
+    isPhoneVerified: { type: Boolean, required: true },
+    profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile', required: true },
+    isOnline: { type: Boolean, required: true, default: false },
+    isActive: { type: Boolean, required: true, default: true },
+    lastLogin: { type: Date, required: true, default: Date.now }
+  },
+  { timestamps: true }
+)
+
+export default mongoose.model<User>('User', userSchema)

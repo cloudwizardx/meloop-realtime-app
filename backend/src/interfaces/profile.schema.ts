@@ -1,4 +1,7 @@
+import { Types } from "mongoose"
+
 export interface Profile {
+  _id?: Types.ObjectId
   firstName: string
   lastName: string
   nickName: string
@@ -12,5 +15,7 @@ export interface Profile {
   phone: string
   gender: string
   friendsCount: number
-  address: [{ name: string; specificAddress: string; }]
+  address: [{ name: string; specificAddress: string }]
+  createdAt?: Date
+  updatedAt?: Date
 }
