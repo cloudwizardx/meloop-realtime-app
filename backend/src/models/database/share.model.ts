@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Share } from '~/interfaces/share.schema'
+import { Share } from '~/interfaces/schema/share.schema'
 
 const shareSchema = new mongoose.Schema<Share>(
   {

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Message } from '~/interfaces/message.schema'
+import { Message } from '~/interfaces/schema/message.schema'
 import { REGEX_LINK_MESSAGE } from '~/utils/app.constant'
 
 const messageSchema = new mongoose.Schema<Message>(

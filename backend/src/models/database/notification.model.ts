@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Notification } from '~/interfaces/notification.schema'
+import { Notification } from '~/interfaces/schema/notification.schema'
 
 const notificationSchema = new mongoose.Schema<Notification>(
   {

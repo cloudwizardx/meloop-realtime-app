@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Like } from '~/interfaces/like.schema'
+import { Like } from '~/interfaces/schema/like.schema'
 
 const likeSchema = new mongoose.Schema<Like>(
   {

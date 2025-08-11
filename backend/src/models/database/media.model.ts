@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Media } from '~/interfaces/media.schema'
+import { Media } from '~/interfaces/schema/media.schema'
 
 const mediaSchema = new mongoose.Schema<Media>(
   {

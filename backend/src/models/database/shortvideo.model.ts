@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { ShortVideo } from '~/interfaces/shortvideo.schema'
+import { ShortVideo } from '~/interfaces/schema/shortvideo.schema'
 
 const shortVideoSchema = new mongoose.Schema<ShortVideo>(
   {

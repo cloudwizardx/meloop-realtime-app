@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Follower } from '~/interfaces/follower.schema'
+import { Follower } from '~/interfaces/schema/follower.schema'
 
 const followerSchema = new mongoose.Schema<Follower>(
   {

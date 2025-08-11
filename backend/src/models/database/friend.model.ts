@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Friend } from '~/interfaces/friend.schema'
+import { Friend } from '~/interfaces/schema/friend.schema'
 
 const friendSchema = new mongoose.Schema<Friend>(
   {

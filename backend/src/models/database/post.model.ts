@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Post } from '~/interfaces/post.schema'
+import { Post } from '~/interfaces/schema/post.schema'
 
 const postSchema = new mongoose.Schema<Post>(
   {

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { BlackList } from '~/interfaces/blacklist.schema'
+import { BlackList } from '~/interfaces/schema/blacklist.schema'
 
 const blackListSchema = new mongoose.Schema<BlackList>(
   {

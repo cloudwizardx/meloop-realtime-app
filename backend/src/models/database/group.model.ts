@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Group } from '~/interfaces/group.schema'
+import { Group } from '~/interfaces/schema/group.schema'
 
 const groupSchema = new mongoose.Schema<Group>(
   {

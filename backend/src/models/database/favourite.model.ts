@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Favorite } from '~/interfaces/favorite.schema'
+import { Favorite } from '~/interfaces/schema/favorite.schema'
 
 const favoriteSchema = new mongoose.Schema<Favorite>(
   {

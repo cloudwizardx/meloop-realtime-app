@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Page } from '~/interfaces/page.schema'
+import { Page } from '~/interfaces/schema/page.schema'
 
 const pageSchema = new mongoose.Schema<Page>(
   {

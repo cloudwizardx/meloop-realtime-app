@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Profile } from '~/interfaces/profile.schema'
+import { Profile } from '~/interfaces/schema/profile.schema'
 import { COVER_PHOTO_DEFAULT } from '~/utils/app.constant'
 
 const profileSchema = new mongoose.Schema<Profile>(

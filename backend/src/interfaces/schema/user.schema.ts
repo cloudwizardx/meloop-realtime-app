@@ -7,12 +7,13 @@ export interface User {
   password: string
   isEmailVerified: boolean
   isPhoneVerified: boolean
-  profile: Profile
+  profile: Types.ObjectId
   isOnline: boolean
   isActive: boolean
   role: 'User' | 'Admin' | 'Moderator' // User roles
   levelMember: 'Normal' | 'Gold' | 'Diamond'
-  lastLogin: Date
+  lastLogin: Date | null
+  permissions?: string[]
   createdAt?: Date
   updatedAt?: Date
 }
