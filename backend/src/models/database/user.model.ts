@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema<User>(
     profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile', required: true },
     isOnline: { type: Boolean, required: true, default: false },
     isActive: { type: Boolean, required: true, default: true },
-    lastLogin: { type: Date, required: true, default: Date.now }
+    lastLogin: { type: Date, required: true, default: Date.now },
+    role: { type: String, enum: ['User', 'Admin', 'Moderator'], required: true, default: 'User' },
+    levelMember: { type: String, enum: ['Normal', 'Gold', 'Diamond'], required: true, default: 'Normal' }
   },
   { timestamps: true }
 )

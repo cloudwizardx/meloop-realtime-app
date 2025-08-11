@@ -4,7 +4,12 @@ import { Group } from '~/interfaces/group.schema'
 const groupSchema = new mongoose.Schema<Group>(
   {
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    members: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        nickname: { type: String, required: true } // Nickname of the member in the group
+      }
+    ],
     name: { type: String, required: true },
     description: { type: String, required: false },
     slogan: { type: String, required: false },

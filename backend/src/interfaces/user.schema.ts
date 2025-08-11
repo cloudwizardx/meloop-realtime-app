@@ -10,6 +10,8 @@ export interface User {
   profile: Profile
   isOnline: boolean
   isActive: boolean
+  role: 'User' | 'Admin' | 'Moderator' // User roles
+  levelMember: 'Normal' | 'Gold' | 'Diamond'
   lastLogin: Date
   createdAt?: Date
   updatedAt?: Date
