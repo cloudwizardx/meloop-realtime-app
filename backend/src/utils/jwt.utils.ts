@@ -1,6 +1,7 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
 import fs from 'fs'
-import { ClaimsPayload, PayloadVerified } from '~/interfaces/auth/claims.payload.interface'
+import z from 'zod'
+import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface';
 import crypto from 'crypto'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 
@@ -32,6 +33,8 @@ export const signAccessToken = (claims: ClaimsPayload): string => {
 export const signRefreshToken = (): string => {
   return crypto.randomBytes(64).toString('hex')
 }
+
+type PayloadVerified = z.infer<typeof PayloadSchema>
 
 export const verifyToken = (token: string): PayloadVerified | null => {
   const payload: PayloadVerified = jwt.verify(token, PUBLIC_KEY_PATH) as PayloadVerified
