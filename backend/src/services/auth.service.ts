@@ -14,6 +14,7 @@ import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.i
 import z from 'zod'
 import ms from 'ms'
 import { parseExpiration } from '~/utils/common.function'
+import { Types } from 'mongoose'
 
 export const register = async (body: RegisterRequest) => {
   const existingUser = await UserModel.find({ email: body.email })
@@ -100,6 +101,12 @@ export const login = async (request: LoginRequest) => {
   } as ClaimsPayload)
 
   const refreshToken = signRefreshToken()
+  clearAndCreateRefreshToken({
+    token: refreshToken,
+    expiresIn: new Date(Date.now() + parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')),
+    userId: savedUser?._id ?? null
+  })
+
   return {
     accessToken,
     refreshToken
@@ -114,7 +121,6 @@ export const refreshToken = async (asToken: string) => {
     throw new Error('Token invalid!')
   }
 
-  await RefreshTokenModel.deleteMany({ userId: payload.userId })
   const refreshToken: string = signRefreshToken()
   const accessToken: string = signAccessToken({
     userId: payload.userId,
@@ -123,14 +129,33 @@ export const refreshToken = async (asToken: string) => {
     permissions: payload.permissions
   } as ClaimsPayload)
 
-  await RefreshTokenModel.create({
+  clearAndCreateRefreshToken({
     token: refreshToken,
     expiresIn: new Date(Date.now() + parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')),
-    userId: payload.userId
+    userId: new Types.ObjectId(payload.userId)
   })
 
   return {
     accessToken,
     refreshToken
   }
+}
+
+interface ClearAndCreateRefreshTokenParams {
+  token: string
+  expiresIn: Date
+  userId: Types.ObjectId | null
+}
+
+async function clearAndCreateRefreshToken({ token, expiresIn, userId }: ClearAndCreateRefreshTokenParams) {
+  if (userId) {
+    throw new Error('User id not null!')
+  }
+
+  await RefreshTokenModel.deleteMany({ userId: userId })
+  await RefreshTokenModel.create({
+    token: token,
+    expiresIn: expiresIn,
+    userId: userId
+  })
 }
