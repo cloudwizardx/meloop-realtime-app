@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { loginWithCredentials, registerNewUser, verifyEmail } from '~/services/auth.service'
+import { loginWithCredentials, refreshToken, registerNewUser, verifyEmail } from '~/services/auth.service'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -32,6 +32,15 @@ export const verifyEmailUser = async (req: Request, res: Response, next: NextFun
     res.status(200).json({
       message: 'Your account verified email successfully!'
     })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const refresh = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { asToken, rfToken } = await refreshToken(req.body)
+    res.status(200).json({ accessToken: asToken, refreshToken: rfToken, isAuthenticated: true })
   } catch (error) {
     next(error)
   }

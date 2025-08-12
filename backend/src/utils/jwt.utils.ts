@@ -1,13 +1,12 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
-import fs from 'fs'
 import z from 'zod'
 import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface';
 import crypto from 'crypto'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 
-const PUBLIC_KEY_PATH = fs.readFileSync(process.env.JWT_PUBLIC_KEY!, 'utf-8')
+const PUBLIC_KEY = process.env.JWT_PUBLIC_KEY! // assert make sure have value
 
-const PRIVATE_KEY_PATH = fs.readFileSync(process.env.JWT_PRIVATE_KEY!, 'utf-8')
+const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY!
 
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION
 
@@ -27,7 +26,7 @@ const options: SignOptions = {
 }
 
 export const signAccessToken = (claims: ClaimsPayload): string => {
-  return jwt.sign(claims, PRIVATE_KEY_PATH, options)
+  return jwt.sign(claims, PRIVATE_KEY, options)
 }
 
 export const signRefreshToken = (): string => {
@@ -37,7 +36,7 @@ export const signRefreshToken = (): string => {
 type PayloadVerified = z.infer<typeof PayloadSchema>
 
 export const verifyToken = (token: string): PayloadVerified | null => {
-  const payload: PayloadVerified = jwt.verify(token, PUBLIC_KEY_PATH) as PayloadVerified
+  const payload: PayloadVerified = jwt.verify(token, PUBLIC_KEY) as PayloadVerified
   if (payload.exp < Date.now() / 1000) {
     throw new ExpiredTokenException()
   }

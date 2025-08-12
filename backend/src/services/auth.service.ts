@@ -14,6 +14,8 @@ import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.i
 import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
+import { RefreshToken } from '~/interfaces/schema/refresh.schema';
+import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 
 export const registerNewUser = async (body: RegisterRequest) => {
   const existingUser = await UserModel.find({ email: body.email })
@@ -114,29 +116,39 @@ export const loginWithCredentials = async (request: LoginRequest) => {
 
 type PayloadVerified = z.infer<typeof PayloadSchema>
 
-export const refreshToken = async (asToken: string) => {
+interface RefreshTokenParams {
+  asToken: string
+  rfToken: string
+}
+
+export const refreshToken = async ({ asToken, rfToken }: RefreshTokenParams) => {
   const payload: PayloadVerified = verifyToken(asToken) as PayloadVerified
   if (!payload) {
     throw new Error('Token invalid!')
   }
 
-  const refreshToken: string = signRefreshToken()
-  const accessToken: string = signAccessToken({
-    userId: payload.userId,
-    levelMember: payload.levelMember,
-    role: payload.role,
-    permissions: payload.permissions
-  } as ClaimsPayload)
+  const loadedCurrentRfToken = await RefreshTokenModel.findOne({ token: rfToken })
+  if (loadedCurrentRfToken && loadedCurrentRfToken.expiresIn.getTime() < Date.now()) {
+    const refreshToken: string = signRefreshToken()
+    const accessToken: string = signAccessToken({
+      userId: payload.userId,
+      levelMember: payload.levelMember,
+      role: payload.role,
+      permissions: payload.permissions
+    } as ClaimsPayload)
 
-  clearAndCreateRefreshToken({
-    token: refreshToken,
-    expiresIn: new Date(Date.now() + parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')),
-    userId: new Types.ObjectId(payload.userId)
-  })
+    clearAndCreateRefreshToken({
+      token: refreshToken,
+      expiresIn: new Date(Date.now() + parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')),
+      userId: new Types.ObjectId(payload.userId)
+    })
 
-  return {
-    accessToken,
-    refreshToken
+    return {
+      asToken: accessToken,
+      rfToken: refreshToken
+    }
+  } else {
+    throw new ExpiredTokenException('Refresh token expired time! Please, login again')
   }
 }
 
