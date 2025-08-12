@@ -14,7 +14,6 @@ import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.i
 import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
-import { RefreshToken } from '~/interfaces/schema/refresh.schema';
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 
 export const registerNewUser = async (body: RegisterRequest) => {
