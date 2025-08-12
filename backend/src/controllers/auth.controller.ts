@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { login, registerNewUser } from '~/services/auth.service'
+import { loginWithCredentials, registerNewUser } from '~/services/auth.service'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -13,4 +13,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 }
 
-
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { accessToken, refreshToken } = await loginWithCredentials(req.body)
+    res.status(200).json({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      isAuthenticated: true
+    })
+  } catch (error) {
+    next(error)
+  }
+}

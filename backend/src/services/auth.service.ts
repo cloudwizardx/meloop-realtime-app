@@ -64,7 +64,7 @@ export const verifyEmail = async (email: string) => {
   )
 }
 
-export const login = async (request: LoginRequest) => {
+export const loginWithCredentials = async (request: LoginRequest) => {
   const loadedUser = await UserModel.findOne({ email: request.email })
   if (!loadedUser) {
     throw new Error(`User with email ${request.email} not exists or is not active`)
