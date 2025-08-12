@@ -12,7 +12,6 @@ import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
 import { signAccessToken, signRefreshToken, verifyToken } from '~/utils/jwt.utils'
 import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
 import z from 'zod'
-import ms from 'ms'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 
