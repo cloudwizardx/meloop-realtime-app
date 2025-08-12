@@ -50,7 +50,7 @@ export const registerNewUser = async (body: RegisterRequest) => {
 
 export const verifyEmail = async (email: string) => {
   const loadedUser = await UserModel.find({ email: email })
-  if (loadedUser) {
+  if (!loadedUser) {
     throw new Error(`User with email ${email} not exists`)
   }
 
