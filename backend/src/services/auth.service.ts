@@ -2,14 +2,18 @@ import EmailAlreadyExistsException from '~/exceptions/email.exist.exception'
 import { RegisterRequest } from '~/interfaces/auth/register.request'
 import ProfileModel from '~/models/database/profile.model'
 import UserModel from '~/models/database/user.model'
+import RefreshTokenModel from '~/models/database/refresh.token.model'
 import { AVATAR_DEFAULT, COVER_PHOTO_DEFAULT, USER_PERMISSIONS } from '~/utils/app.constant'
 import bcrypt from 'bcrypt'
 import { LoginRequest } from '~/exceptions/login.request'
 import { InvalidCredentialException } from '~/exceptions/invalid.credential'
 import { UnverifiedEmail } from '~/exceptions/account.not.verify.email.exception'
 import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
-import { signAccessToken, signRefreshToken } from '~/utils/jwt.utils'
-import { ClaimsPayload } from '~/interfaces/auth/claims.payload.interface'
+import { signAccessToken, signRefreshToken, verifyToken } from '~/utils/jwt.utils'
+import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
+import z from 'zod'
+import ms from 'ms'
+import { parseExpiration } from '~/utils/common.function'
 
 export const register = async (body: RegisterRequest) => {
   const existingUser = await UserModel.find({ email: body.email })
@@ -96,6 +100,35 @@ export const login = async (request: LoginRequest) => {
   } as ClaimsPayload)
 
   const refreshToken = signRefreshToken()
+  return {
+    accessToken,
+    refreshToken
+  }
+}
+
+type PayloadVerified = z.infer<typeof PayloadSchema>
+
+export const refreshToken = async (asToken: string) => {
+  const payload: PayloadVerified = verifyToken(asToken) as PayloadVerified
+  if (!payload) {
+    throw new Error('Token invalid!')
+  }
+
+  await RefreshTokenModel.deleteMany({ userId: payload.userId })
+  const refreshToken: string = signRefreshToken()
+  const accessToken: string = signAccessToken({
+    userId: payload.userId,
+    levelMember: payload.levelMember,
+    role: payload.role,
+    permissions: payload.permissions
+  } as ClaimsPayload)
+
+  await RefreshTokenModel.create({
+    token: refreshToken,
+    expiresIn: new Date(Date.now() + parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')),
+    userId: payload.userId
+  })
+
   return {
     accessToken,
     refreshToken
