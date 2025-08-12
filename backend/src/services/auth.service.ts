@@ -15,7 +15,7 @@ import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 
-export const register = async (body: RegisterRequest) => {
+export const registerNewUser = async (body: RegisterRequest) => {
   const existingUser = await UserModel.find({ email: body.email })
   if (existingUser) {
     throw new EmailAlreadyExistsException(`Email ${body.email} already exists`)
