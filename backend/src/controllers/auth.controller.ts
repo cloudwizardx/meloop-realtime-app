@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { loginWithCredentials, refreshToken, registerNewUser, verifyEmail } from '~/services/auth.service'
+import { parseExpiration } from '~/utils/common.function'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,9 +17,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { accessToken, refreshToken } = await loginWithCredentials(req.body)
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')
+    })
     res.status(200).json({
       accessToken: accessToken,
-      refreshToken: refreshToken,
       isAuthenticated: true
     })
   } catch (error) {
@@ -40,7 +47,14 @@ export const verifyEmailUser = async (req: Request, res: Response, next: NextFun
 export const refresh = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { asToken, rfToken } = await refreshToken(req.body)
-    res.status(200).json({ accessToken: asToken, refreshToken: rfToken, isAuthenticated: true })
+
+    res.cookie('refreshToken', rfToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: parseExpiration(process.env.JWT_REFRESH_EXPIRATION ?? '')
+    })
+    res.status(200).json({ accessToken: asToken, isAuthenticated: true })
   } catch (error) {
     next(error)
   }
