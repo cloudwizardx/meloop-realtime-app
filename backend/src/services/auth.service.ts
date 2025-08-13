@@ -15,11 +15,12 @@ import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
+import jwt from 'jsonwebtoken'
 
 export const registerNewUser = async (body: RegisterRequest) => {
-  const existingUser = await UserModel.find({ email: body.email })
+  const existingUser = await UserModel.findOne({ email: body.email })
   if (existingUser) {
-    throw new EmailAlreadyExistsException(`Email ${body.email} already exists`)
+    throw new EmailAlreadyExistsException(`${body.email} already exists`)
   }
 
   if (body.password !== body.confirmPassword) {
@@ -49,14 +50,15 @@ export const registerNewUser = async (body: RegisterRequest) => {
   })
 }
 
-export const verifyEmail = async (email: string) => {
-  const loadedUser = await UserModel.find({ email: email })
+export const verifyEmail = async (token: string) => {
+  const decoded = jwt.verify(token, process.env.EMAIL_VERIFY_SECRET!) as { email: string }
+  const loadedUser = await UserModel.findOne({ email: decoded.email })
   if (!loadedUser) {
-    throw new Error(`User with email ${email} not exists`)
+    throw new Error(`User with email ${decoded.email} not exists`)
   }
 
   await UserModel.updateOne(
-    { email: email },
+    { email: decoded.email },
     {
       isEmailVerified: true,
       permissions: USER_PERMISSIONS,
@@ -72,7 +74,7 @@ export const loginWithCredentials = async (request: LoginRequest) => {
   }
 
   if (!loadedUser.isEmailVerified) {
-    throw new UnverifiedEmail(`Email ${request.email} is not verified`)
+    throw new UnverifiedEmail(`${request.email} is not verified`)
   }
 
   if (!loadedUser.isActive) {
@@ -127,7 +129,7 @@ export const refreshToken = async ({ asToken, rfToken }: RefreshTokenParams) => 
   }
 
   const loadedCurrentRfToken = await RefreshTokenModel.findOne({ token: rfToken })
-  if (loadedCurrentRfToken && loadedCurrentRfToken.expiresIn.getTime() < Date.now()) {
+  if (loadedCurrentRfToken && loadedCurrentRfToken.expiresIn.getTime() > Date.now()) {
     const refreshToken: string = signRefreshToken()
     const accessToken: string = signAccessToken({
       userId: payload.userId,

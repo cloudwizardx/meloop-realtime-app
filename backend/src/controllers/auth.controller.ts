@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { loginWithCredentials, refreshToken, registerNewUser, verifyEmail } from '~/services/auth.service'
 import { parseExpiration } from '~/utils/common.function'
+import { sendVerificationEmail } from '~/utils/email.utils'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -8,6 +9,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     if (!savedUser) {
       res.status(400).json({ message: 'Register account failed!', data: null })
     }
+
+    sendVerificationEmail(savedUser.email)
     res.status(201).json({ message: 'User registered successfully!', data: savedUser })
   } catch (error) {
     next(error)
@@ -35,9 +38,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const verifyEmailUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await verifyEmail(req.body)
+    const { token } = req.query
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ message: 'Token is required' })
+    }
+
+    await verifyEmail(token)
     res.status(200).json({
-      message: 'Your account verified email successfully!'
+      message: 'Your account verified email successfully!',
+      data: true
     })
   } catch (error) {
     next(error)

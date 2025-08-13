@@ -12,7 +12,6 @@ export interface User {
   role: 'User' | 'Admin' | 'Moderator' // User roles
   levelMember: 'Normal' | 'Gold' | 'Diamond'
   lastLogin: Date | null
-  permissions?: string[]
   createdAt?: Date
   updatedAt?: Date
 }

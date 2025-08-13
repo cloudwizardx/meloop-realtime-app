@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import fa from 'zod/v4/locales/fa.js'
 import { User } from '~/interfaces/schema/user.schema'
 
 const userSchema = new mongoose.Schema<User>(
@@ -13,8 +12,7 @@ const userSchema = new mongoose.Schema<User>(
     isActive: { type: Boolean, required: true, default: true },
     lastLogin: { type: Date, required: false, default: null },
     role: { type: String, enum: ['User', 'Admin', 'Moderator'], required: true, default: 'User' },
-    levelMember: { type: String, enum: ['Normal', 'Gold', 'Diamond'], required: true, default: 'Normal' },
-    permissions: [{ type: String, required: false }]
+    levelMember: { type: String, enum: ['Normal', 'Gold', 'Diamond'], required: true, default: 'Normal' }
   },
   { timestamps: true }
 )
