@@ -1,12 +1,15 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
 import z from 'zod'
-import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface';
+import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
 import crypto from 'crypto'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
+import fs from 'fs'
+import path from 'path'
+import { parseExpiration } from './common.function'
 
-const PUBLIC_KEY = process.env.JWT_PUBLIC_KEY! // assert make sure have value
+const PRIVATE_KEY = fs.readFileSync(path.join(__dirname, '../../keys/private.pem'), 'utf8')
 
-const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY!
+const PUBLIC_KEY = fs.readFileSync(path.join(__dirname, '../../keys/public.pem'), 'utf8')
 
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION
 
@@ -20,7 +23,7 @@ if (!JWT_EXPIRATION || !JWT_ISSUER || !JWT_AUDIENCE) {
 
 const options: SignOptions = {
   algorithm: 'RS256',
-  expiresIn: Number(JWT_EXPIRATION),
+  expiresIn: parseExpiration(JWT_EXPIRATION),
   issuer: JWT_ISSUER,
   audience: JWT_AUDIENCE
 }

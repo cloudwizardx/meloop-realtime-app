@@ -11,10 +11,11 @@ import { UnverifiedEmail } from '~/exceptions/account.not.verify.email.exception
 import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
 import { signAccessToken, signRefreshToken, verifyToken } from '~/utils/jwt.utils'
 import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
-import z from 'zod'
+import z, { email } from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
+import UserPermissionModel from '~/models/database/permission.model'
 import jwt from 'jsonwebtoken'
 
 export const registerNewUser = async (body: RegisterRequest) => {
@@ -26,11 +27,12 @@ export const registerNewUser = async (body: RegisterRequest) => {
   if (body.password !== body.confirmPassword) {
     throw new Error('Password and confirm password do not match')
   }
+  const aId: number = Math.floor(Math.random() * 100) + 1
 
   const profile = await ProfileModel.create({
     firstName: body.firstName,
     lastName: body.lastName,
-    avatar: AVATAR_DEFAULT + Math.floor(Math.random() * 100) + 1,
+    avatar: `${AVATAR_DEFAULT}${aId}`,
     coverPhoto: COVER_PHOTO_DEFAULT
   })
 
@@ -45,7 +47,6 @@ export const registerNewUser = async (body: RegisterRequest) => {
     isActive: false,
     role: 'User',
     levelMember: 'Normal',
-    permissions: [],
     lastLogin: null
   })
 }
@@ -57,14 +58,21 @@ export const verifyEmail = async (token: string) => {
     throw new Error(`User with email ${decoded.email} not exists`)
   }
 
-  await UserModel.updateOne(
-    { email: decoded.email },
-    {
-      isEmailVerified: true,
-      permissions: USER_PERMISSIONS,
-      isActive: true
-    }
-  )
+  if (!loadedUser.isEmailVerified) {
+    await UserPermissionModel.create({
+      userId: loadedUser._id,
+      role: loadedUser.role,
+      permissions: Object.values(USER_PERMISSIONS)
+    })
+
+    await UserModel.updateOne(
+      { email: decoded.email },
+      {
+        isEmailVerified: true,
+        isActive: true
+      }
+    )
+  }
 }
 
 export const loginWithCredentials = async (request: LoginRequest) => {
@@ -98,8 +106,7 @@ export const loginWithCredentials = async (request: LoginRequest) => {
   const accessToken = signAccessToken({
     userId: savedUser?._id?.toString(),
     levelMember: savedUser?.levelMember,
-    role: savedUser?.role,
-    permissions: savedUser?.permissions || []
+    role: savedUser?.role
   } as ClaimsPayload)
 
   const refreshToken = signRefreshToken()
@@ -134,8 +141,7 @@ export const refreshToken = async ({ asToken, rfToken }: RefreshTokenParams) => 
     const accessToken: string = signAccessToken({
       userId: payload.userId,
       levelMember: payload.levelMember,
-      role: payload.role,
-      permissions: payload.permissions
+      role: payload.role
     } as ClaimsPayload)
 
     clearAndCreateRefreshToken({
@@ -160,7 +166,7 @@ interface ClearAndCreateRefreshTokenParams {
 }
 
 async function clearAndCreateRefreshToken({ token, expiresIn, userId }: ClearAndCreateRefreshTokenParams) {
-  if (userId) {
+  if (!userId) {
     throw new Error('User id not null!')
   }
 
