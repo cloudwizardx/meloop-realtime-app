@@ -16,6 +16,8 @@ export interface Profile {
   gender: string
   friendsCount: number
   address: [{ name: string; specificAddress: string }]
+  socialUrl: [{ name: string; url: string }]
+  introSelf: string
   createdAt?: Date
   updatedAt?: Date
 }

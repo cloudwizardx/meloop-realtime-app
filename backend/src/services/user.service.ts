@@ -34,3 +34,27 @@ export const updateCoverPhoto = async (folder: string, fileBuffer: Buffer, user:
 
   return false
 }
+
+export const updateName = async (keyName: string, editName: string, user: User): Promise<boolean> => {
+  try {
+    if (keyName === 'FirstName') {
+      await profileModel.updateOne(
+        {
+          _id: user._id
+        },
+        { $set: { firstName: editName } }
+      )
+    } else {
+      await profileModel.updateOne(
+        {
+          _id: user._id
+        },
+        { $set: { lastName: editName } }
+      )
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+

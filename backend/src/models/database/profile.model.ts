@@ -22,7 +22,14 @@ const profileSchema = new mongoose.Schema<Profile>(
         name: { type: String, required: false, default: '' },
         specificAddress: { type: String, required: false, default: '' }
       }
-    ]
+    ],
+    socialUrl: [
+      {
+        name: { type: String, required: false },
+        url: { type: String, required: false }
+      }
+    ],
+    introSelf: { type: String, required: false }
   },
   { timestamps: true }
 )
