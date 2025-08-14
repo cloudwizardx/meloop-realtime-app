@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { UnauthorizeException } from '~/exceptions/unauthorized.exception'
-import { updateCoverPhoto, updateName, updatePhoto } from '~/services/user.service'
+import { updateCoverPhoto, updateGender, updateName, updatePhoto } from '~/services/user.service'
 import { FOLDER_PHOTO_USER_RESOURCES } from '~/utils/app.constant'
 
 export const uploadPhoto = async (req: Request, res: Response, next: NextFunction) => {
@@ -62,6 +62,35 @@ export const editName = async (req: Request, res: Response, next: NextFunction) 
     } else {
       res.status(400).json({ message: 'Fail to update name!' })
     }
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}
+
+export const editGender = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      throw new UnauthorizeException('Unauthorize to access this function!')
+    }
+
+    const { gender } = req.body
+    const isUpdated = await updateGender(gender, req.user)
+
+    if (isUpdated) {
+      res.status(201).json({ message: 'Updated gender successfully!' })
+    } else {
+      res.status(400).json({ message: 'Fail to update gender!' })
+    }
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}
+
+export const editSocialUrlContact = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
   } catch (error) {
     console.log(error)
     next(error)

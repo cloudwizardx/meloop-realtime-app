@@ -24,4 +24,6 @@ router.patch(
 
 router.patch('/name', protectRoute, requirePermission('update_contact_profile'), userController.editName)
 
+router.patch('/gender', protectRoute, requirePermission('update_contact_profile'), userController.editGender)
+
 export default router

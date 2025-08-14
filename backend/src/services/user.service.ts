@@ -58,3 +58,11 @@ export const updateName = async (keyName: string, editName: string, user: User):
   }
 }
 
+export const updateGender = async (gender: string, user: User): Promise<boolean> => {
+  try {
+    await profileModel.updateOne({ _id: user._id }, { $set: { gender: gender } })
+    return true
+  } catch {
+    return false
+  }
+}

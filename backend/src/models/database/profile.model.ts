@@ -15,7 +15,7 @@ const profileSchema = new mongoose.Schema<Profile>(
     major: { type: String, required: false, default: '' },
     school: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: '' },
-    gender: { type: String, enum: ['Male', 'Female', 'Other'], required: false, default: 'Other' },
+    gender: { type: String, required: false, default: 'Unknown' },
     friendsCount: { type: Number, required: false, default: 0 },
     address: [
       {
