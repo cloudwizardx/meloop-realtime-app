@@ -11,7 +11,7 @@ import { UnverifiedEmail } from '~/exceptions/account.not.verify.email.exception
 import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
 import { signAccessToken, signRefreshToken, verifyToken } from '~/utils/jwt.utils'
 import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
-import z, { email } from 'zod'
+import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
