@@ -129,4 +129,22 @@ export const editDateOfBirth = async (req: Request, res: Response, next: NextFun
   }
 }
 
+// edit details for nickname, intro self, bio following by fieldName
+export const editDetailsInfoSelf = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      throw new UnauthorizeException('Unauthorize to access this function!')
+    }
 
+    const { fieldName, text } = req.body
+    const isUpdated = await userServices.updateDetails(fieldName, text, req.user)
+    if (isUpdated) {
+      res.status(201).json({ message: 'Updated date of birth successfully!' })
+    } else {
+      res.status(400).json({ message: 'Fail to update date of birth!' })
+    }
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}

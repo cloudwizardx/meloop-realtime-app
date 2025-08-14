@@ -69,7 +69,7 @@ export const updateGender = async (gender: string, user: User): Promise<boolean>
 
 export const updateSocialUrl = async (data: { name: string; url: string }[], user: User): Promise<boolean> => {
   try {
-    await [profileModel.updateOne({ _id: user._id }, { $set: { socialUrl: data } })]
+    await profileModel.updateOne({ _id: user._id }, { $set: { socialUrl: data } })
     return true
   } catch {
     return false
@@ -78,7 +78,22 @@ export const updateSocialUrl = async (data: { name: string; url: string }[], use
 
 export const updateDateOfBirth = async (dateOfBirth: Date, user: User): Promise<boolean> => {
   try {
-    await [profileModel.updateOne({ _id: user._id }, { $set: { dateOfBirth: dateOfBirth } })]
+    await profileModel.updateOne({ _id: user._id }, { $set: { dateOfBirth: dateOfBirth } })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const updateDetails = async (fieldName: string, text: string, user: User): Promise<boolean> => {
+  try {
+    if (fieldName === 'Bio') {
+      await profileModel.updateOne({ _id: user._id }, { $set: { bio: text } })
+    } else if (fieldName === 'Nickname') {
+      await profileModel.updateOne({ _id: user._id }, { $set: { nickName: text } })
+    } else {
+      await profileModel.updateOne({ _id: user._id }, { $set: { introSelf: text } })
+    }
     return true
   } catch {
     return false

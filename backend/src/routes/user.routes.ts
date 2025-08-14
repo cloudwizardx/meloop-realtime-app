@@ -35,4 +35,11 @@ router.patch(
 
 router.patch('/dob', protectRoute, requirePermission('update_contact_profile'), userController.editDateOfBirth)
 
+router.put(
+  '/personal-details',
+  protectRoute,
+  requirePermission('update_contact_profile'),
+  userController.editDetailsInfoSelf
+)
+
 export default router
