@@ -3,7 +3,7 @@ import { RegisterRequest } from '~/interfaces/auth/register.request'
 import ProfileModel from '~/models/database/profile.model'
 import UserModel from '~/models/database/user.model'
 import RefreshTokenModel from '~/models/database/refresh.token.model'
-import { AVATAR_DEFAULT, COVER_PHOTO_DEFAULT, USER_PERMISSIONS } from '~/utils/app.constant'
+import { AVATAR_DEFAULT, COVER_PHOTO_DEFAULT } from '~/utils/app.constant'
 import bcrypt from 'bcrypt'
 import { LoginRequest } from '~/exceptions/login.request'
 import { InvalidCredentialException } from '~/exceptions/invalid.credential'
@@ -15,7 +15,6 @@ import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
-import UserPermissionModel from '~/models/database/permission.model'
 import jwt from 'jsonwebtoken'
 
 export const registerNewUser = async (body: RegisterRequest) => {
@@ -59,12 +58,6 @@ export const verifyEmail = async (token: string) => {
   }
 
   if (!loadedUser.isEmailVerified) {
-    await UserPermissionModel.create({
-      userId: loadedUser._id,
-      role: loadedUser.role,
-      permissions: Object.values(USER_PERMISSIONS)
-    })
-
     await UserModel.updateOne(
       { email: decoded.email },
       {
