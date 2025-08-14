@@ -1,7 +1,10 @@
 export const AVATAR_DEFAULT = 'https://avatar.iran.liara.run/public/'
+
 export const COVER_PHOTO_DEFAULT =
   'https://onhavanastreet.com/wp-content/uploads/2019/03/Bicycle-Village-fb-cover-photo.jpg'
+
 export const REGEX_LINK_MESSAGE = /\bhttps:\/\/[^\s/$.?#*]+.[^\s]*/i
+
 export const USER_PERMISSIONS = {
   SEND_MESSAGE: 'send_message',
   EDIT_MESSAGE: 'edit_message',
@@ -51,7 +54,11 @@ export const USER_PERMISSIONS = {
   VIEW_FRIEND_POSTS: 'view_friend_posts',
   VIEW_GLOBAL_POSTS: 'view_global_posts',
   SUGGEST_FRIENDS: 'suggest_friends',
-  BIRTHDAY_NOTIFICATIONS: 'birthday_notifications'
+  BIRTHDAY_NOTIFICATIONS: 'birthday_notifications',
+
+  UPLOAD_PHOTO_PROFILE: 'upload_photo_profile'
 }
 
-export const FROM_EMAIL_SENDER="Meloop"
+export const FROM_EMAIL_SENDER = 'Meloop'
+
+export const FOLDER_PHOTO_USER_RESOURCES = 'meloop-app-resources/photo-user-resources'
