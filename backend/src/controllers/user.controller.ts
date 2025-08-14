@@ -107,3 +107,26 @@ export const editSocialUrlContact = async (req: Request, res: Response, next: Ne
     next(error)
   }
 }
+
+export const editDateOfBirth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      throw new UnauthorizeException('Unauthorize to access this function!')
+    }
+
+    const { dateOfBirth } = req.body
+    const dobDate = new Date(dateOfBirth)
+    const isUpdated = await userServices.updateDateOfBirth(dobDate, req.user)
+
+    if (isUpdated) {
+      res.status(201).json({ message: 'Updated date of birth successfully!' })
+    } else {
+      res.status(400).json({ message: 'Fail to update date of birth!' })
+    }
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}
+
+

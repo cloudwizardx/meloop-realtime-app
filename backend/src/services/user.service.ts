@@ -75,3 +75,12 @@ export const updateSocialUrl = async (data: { name: string; url: string }[], use
     return false
   }
 }
+
+export const updateDateOfBirth = async (dateOfBirth: Date, user: User): Promise<boolean> => {
+  try {
+    await [profileModel.updateOne({ _id: user._id }, { $set: { dateOfBirth: dateOfBirth } })]
+    return true
+  } catch {
+    return false
+  }
+}

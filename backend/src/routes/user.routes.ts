@@ -33,4 +33,6 @@ router.patch(
   userController.editSocialUrlContact
 )
 
+router.patch('/dob', protectRoute, requirePermission('update_contact_profile'), userController.editDateOfBirth)
+
 export default router
