@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { UnauthorizeException } from '~/exceptions/unauthorized.exception'
-import { updateCoverPhoto, updateGender, updateName, updatePhoto } from '~/services/user.service'
+import * as userServices from '~/services/user.service'
 import { FOLDER_PHOTO_USER_RESOURCES } from '~/utils/app.constant'
 
 export const uploadPhoto = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,7 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
       throw new Error('No photo file uploaded!')
     }
 
-    const isUploaded = await updatePhoto(FOLDER_PHOTO_USER_RESOURCES, req.file.buffer, req.user)
+    const isUploaded = await userServices.updatePhoto(FOLDER_PHOTO_USER_RESOURCES, req.file.buffer, req.user)
     if (isUploaded) {
       res.status(201).json({ message: 'Uploaded photo' })
     } else {
@@ -35,7 +35,7 @@ export const uploadCoverPhoto = async (req: Request, res: Response, next: NextFu
       throw new Error('No photo file uploaded!')
     }
 
-    const isUploaded = await updateCoverPhoto(FOLDER_PHOTO_USER_RESOURCES, req.file.buffer, req.user)
+    const isUploaded = await userServices.updateCoverPhoto(FOLDER_PHOTO_USER_RESOURCES, req.file.buffer, req.user)
     if (isUploaded) {
       res.status(201).json({ message: 'Uploaded photo' })
     } else {
@@ -55,7 +55,7 @@ export const editName = async (req: Request, res: Response, next: NextFunction) 
     }
 
     const { keyName, editName } = req.body
-    const isUpdated = await updateName(keyName, editName, req.user)
+    const isUpdated = await userServices.updateName(keyName, editName, req.user)
 
     if (isUpdated) {
       res.status(201).json({ message: 'Updated name successfully!' })
@@ -75,7 +75,7 @@ export const editGender = async (req: Request, res: Response, next: NextFunction
     }
 
     const { gender } = req.body
-    const isUpdated = await updateGender(gender, req.user)
+    const isUpdated = await userServices.updateGender(gender, req.user)
 
     if (isUpdated) {
       res.status(201).json({ message: 'Updated gender successfully!' })
@@ -90,7 +90,18 @@ export const editGender = async (req: Request, res: Response, next: NextFunction
 
 export const editSocialUrlContact = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      throw new UnauthorizeException('Unauthorize to access this function!')
+    }
 
+    const { data } = req.body as { data: { name: string; url: string }[] }
+    const isUpdated = await userServices.updateSocialUrl(data, req.user)
+
+    if (isUpdated) {
+      res.status(201).json({ message: 'Updated gender successfully!' })
+    } else {
+      res.status(400).json({ message: 'Fail to update gender!' })
+    }
   } catch (error) {
     console.log(error)
     next(error)

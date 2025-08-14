@@ -66,3 +66,12 @@ export const updateGender = async (gender: string, user: User): Promise<boolean>
     return false
   }
 }
+
+export const updateSocialUrl = async (data: { name: string; url: string }[], user: User): Promise<boolean> => {
+  try {
+    await [profileModel.updateOne({ _id: user._id }, { $set: { socialUrl: data } })]
+    return true
+  } catch {
+    return false
+  }
+}

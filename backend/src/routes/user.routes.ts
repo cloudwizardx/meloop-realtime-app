@@ -26,4 +26,11 @@ router.patch('/name', protectRoute, requirePermission('update_contact_profile'),
 
 router.patch('/gender', protectRoute, requirePermission('update_contact_profile'), userController.editGender)
 
+router.patch(
+  '/social-contacts',
+  protectRoute,
+  requirePermission('update_contact_profile'),
+  userController.editSocialUrlContact
+)
+
 export default router
