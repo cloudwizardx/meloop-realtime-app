@@ -3,7 +3,7 @@ import { UserPermission } from '~/interfaces/schema/permission.schema'
 
 const userPermissionsSchema = new mongoose.Schema<UserPermission>({
   role: { type: String, required: true },
-  level: { type: String, required: true },
+  levelMember: { type: String, required: true },
   permissions: [{ type: String, required: true }]
 })
 

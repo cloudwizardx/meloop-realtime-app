@@ -3,6 +3,6 @@ import { Types } from 'mongoose'
 export interface UserPermission {
   _id?: Types.ObjectId
   role: string
-  level: string
+  levelMember: string
   permissions: string[]
 }
