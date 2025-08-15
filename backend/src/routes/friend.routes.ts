@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from "express"
 import * as friendController from '~/controllers/friend.controller'
 import { protectRoute } from "~/middlewares/auth.middleware"
 import { requirePermission } from "~/middlewares/permission.middleware"

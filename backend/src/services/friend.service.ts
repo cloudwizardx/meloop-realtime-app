@@ -7,6 +7,7 @@ import notificationModel from '~/models/database/notification.model'
 import { notifyFriendInvitationContent } from '~/utils/notification.content'
 import profileModel from '~/models/database/profile.model'
 import { ResourceNotFoundException } from '~/exceptions/resource.not.found.exception'
+import { Friend } from '~/interfaces/schema/friend.schema'
 
 export const createNewFriendInvitation = async (receiverId: Types.ObjectId, currentUser: User) => {
   if (receiverId.equals(currentUser._id)) {
@@ -76,7 +77,7 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   }
 }
 
-export const getMyFriends = async (user: User) => {
-  const friends = await friendModel.find({ $or: [{ userId: user._id }, { friendId: user._id }] })
+export const getMyFriends = async (userId: Types.ObjectId): Promise<Friend[]> => {
+  const friends = await friendModel.find({ $or: [{ userId: userId }, { friendId: userId }] })
   return friends || []
 }
