@@ -8,7 +8,7 @@ import { notifyFriendInvitationContent } from '~/utils/notification.content'
 import profileModel from '~/models/database/profile.model'
 import { ResourceNotFoundException } from '~/exceptions/resource.not.found.exception'
 
-export const createNewFriendInvitation = async (receiverId: Types.ObjectId, currentUser: User): Promise<boolean> => {
+export const createNewFriendInvitation = async (receiverId: Types.ObjectId, currentUser: User) => {
   if (receiverId.equals(currentUser._id)) {
     throw new Error('Cannot send friend request to yourself')
   }
@@ -26,7 +26,10 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   })
 
   if (isFriend) {
-    return false
+    return {
+      status: false,
+      message: 'Cannot send invitations to people who are already friends'
+    }
   }
 
   const pendingInvite = await friendModel.findOne({
@@ -36,7 +39,10 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   })
 
   if (pendingInvite) {
-    return false
+    return {
+      status: false,
+      message: 'Invitation has been sent please wait for their confirmation'
+    }
   }
 
   const friends = await friendModel.create({
@@ -64,5 +70,13 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
     isRead: false
   })
 
-  return true
+  return {
+    status: true,
+    message: 'Sent friend invitation successfully!'
+  }
+}
+
+export const getMyFriends = async (user: User) => {
+  const friends = await friendModel.find({ $or: [{ userId: user._id }, { friendId: user._id }] })
+  return friends || []
 }
