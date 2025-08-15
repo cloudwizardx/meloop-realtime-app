@@ -6,62 +6,61 @@ import { PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
 import { Friend } from '~/interfaces/schema/friend.schema'
 import { getMyFriends } from '~/services/friend.service'
 import { verifyToken } from '~/utils/jwt.utils'
-
-const userSockets: Map<string, string[]> = new Map()
-
-export const getSocketIds = (userId: string): string[] => {
-  return userSockets.get(userId) || []
-}
+import redisClient from '~/configs/redis.config'
+import { createAdapter } from '@socket.io/redis-adapter'
 
 type PayloadVerified = z.infer<typeof PayloadSchema>
 
 export const initSocket = async (io: Server) => {
+  const subClient = redisClient.duplicate()
+  await subClient.connect()
+  io.adapter(createAdapter(redisClient, subClient))
+
   io.use(async (socket, next) => {
     const token = socket.handshake.auth.token
     if (!token) return next(new UnauthorizeException('Unauthorized access!'))
 
     try {
       const payload: PayloadVerified = (await verifyToken(token)) as PayloadVerified
-      ;(socket as any).userId = payload.userId
+      socket.data.userId = payload.userId
       next()
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return next(new UnauthorizeException('Invalid token'))
     }
   })
 
   io.on('connection', async (socket: Socket) => {
-    const userId = (socket as any).userId
+    const userId = socket.data.userId
     console.log('User connected:', userId, socket.id)
+    socket.join(userId)
 
-    if (!userSockets.has(userId)) userSockets.set(userId, [])
-    userSockets.get(userId)?.push(socket.id)
+    const friends: Friend[] = await getMyFriends(new Types.ObjectId(userId))
+    const onlineFriends: Record<string, string[]> = {}
 
-    const currentUserFriends: Friend[] = await getMyFriends(new Types.ObjectId(userId))
-    const getMyOnlineFriendsAndSocketIds: Map<string, string[]> = new Map()
-    currentUserFriends.forEach((x) => {
-      const friendId = x.userId.toString() === userId ? x.friendId.toString() : x.userId.toString()
-      getMyOnlineFriendsAndSocketIds.set(friendId, userSockets.get(friendId) || [])
-    })
+    for (const friend of friends) {
+      const friendId = friend.userId.toString() === userId ? friend.friendId.toString() : friend.userId.toString()
+      const sockets = await io.in(friendId).fetchSockets()
+      onlineFriends[friendId] = sockets.map((f) => f.id)
+    }
 
-    io.emit('getOnlineUsers', Object.fromEntries(getMyOnlineFriendsAndSocketIds))
+    io.emit('getOnlineUsers', onlineFriends)
 
     socket.on('disconnect', async () => {
       console.log('User disconnected:', socket.id)
-      const sockets = userSockets.get(userId) || []
-      userSockets.set(
-        userId,
-        sockets.filter((id) => id !== socket.id)
-      )
-      if ((userSockets.get(userId) || []).length === 0) userSockets.delete(userId)
 
-      const updatedOnlineFriends: Map<string, string[]> = new Map()
-      const friendsAfterDisconnect: Friend[] = await getMyFriends(new Types.ObjectId(userId))
-      friendsAfterDisconnect.forEach((x) => {
-        const friendId = x.userId.toString() === userId ? x.friendId.toString() : x.userId.toString()
-        updatedOnlineFriends.set(friendId, userSockets.get(friendId) || [])
-      })
+      const sockets = await io.in(userId).fetchSockets()
+      if (sockets.length === 0) {
+        const friendsAfterDisconnect: Friend[] = await getMyFriends(new Types.ObjectId(userId))
+        const updatedOnlineFriends: Record<string, string[]> = {}
+        for (const friend of friendsAfterDisconnect) {
+          const friendId = friend.userId.toString() === userId ? friend.friendId.toString() : friend.userId.toString()
+          const socketsInRoom = await io.in(friendId).fetchSockets()
+          updatedOnlineFriends[friendId] = socketsInRoom.map((s) => s.id)
+        }
 
-      io.emit('getOnlineUsers', Object.fromEntries(updatedOnlineFriends))
+        io.emit('getOnlineUsers', updatedOnlineFriends)
+      }
     })
   })
 }
