@@ -9,12 +9,15 @@ import { verifyToken } from '~/utils/jwt.utils'
 import redisClient from '~/configs/redis.config'
 import { createAdapter } from '@socket.io/redis-adapter'
 
+let ioInstance: Server
+
 type PayloadVerified = z.infer<typeof PayloadSchema>
 
 export const initSocket = async (io: Server) => {
   const subClient = redisClient.duplicate()
   await subClient.connect()
   io.adapter(createAdapter(redisClient, subClient))
+  ioInstance = io
 
   io.use(async (socket, next) => {
     const token = socket.handshake.auth.token
@@ -63,4 +66,9 @@ export const initSocket = async (io: Server) => {
       }
     })
   })
+}
+
+export const getIo = () => {
+  if (!ioInstance) throw new Error('Socket.IO not initialized')
+  return ioInstance
 }

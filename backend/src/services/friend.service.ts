@@ -56,8 +56,8 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   if (!currentUserProfile) {
     throw new ResourceNotFoundException('Current user profile not exist!')
   }
-
-  const notificationContent = notifyFriendInvitationContent(currentUserProfile?.id)
+  const userName = `${currentUserProfile?.firstName} ${currentUserProfile?.lastName}`
+  const notificationContent = notifyFriendInvitationContent(userName)
 
   await notificationModel.create({
     senderId: currentUser._id,
@@ -73,7 +73,15 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
 
   return {
     status: true,
-    message: 'Sent friend invitation successfully!'
+    message: 'Sent friend invitation successfully!',
+    data: {
+      receiverId: receiver._id.toString(),
+      sender: {
+        id: currentUser._id ? currentUser._id.toString() : '',
+        name: userName,
+        avatar: currentUserProfile?.avatar
+      }
+    }
   }
 }
 

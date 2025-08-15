@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { UnauthorizeException } from '~/exceptions/unauthorized.exception'
+import { getIo } from '~/libs/socket'
 import * as friendServices from '~/services/friend.service'
 
 export const sendFriendInvitation = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,11 +12,15 @@ export const sendFriendInvitation = async (req: Request, res: Response, next: Ne
 
     const { receiverId } = req.params // if query can be one or more than one value
     const receiverObjectId = new Types.ObjectId(receiverId)
-    const { status, message } = await friendServices.createNewFriendInvitation(receiverObjectId, req.user)
-    if (status) {
-      res.status(201).json({ message: message })
+    const result = await friendServices.createNewFriendInvitation(receiverObjectId, req.user)
+    if (result.status) {
+      const io = getIo()
+      if (result.data?.receiverId) {
+        io.to(result.data.receiverId).emit('receiveFriendInvitation', result.data.sender)
+      }
+      return res.status(200).json({ message: 'Invitation sent successfully' })
     } else {
-      res.status(400).json({ message: message })
+      res.status(400).json({ message: 'Fail to send invitation' })
     }
   } catch (error) {
     console.log(error)
