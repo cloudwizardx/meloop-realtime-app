@@ -9,6 +9,7 @@ export interface Message {
   isEdited: boolean
   media?: [
     {
+      mediaId: Types.ObjectId
       url: string
       type: 'Image' | 'Video'
       size: number

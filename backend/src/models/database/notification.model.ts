@@ -7,11 +7,14 @@ const notificationSchema = new mongoose.Schema<Notification>(
     receiverIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
     contextType: {
       type: String,
-      enum: ['Post', 'Comment', 'Message', 'Follower', 'Page', 'Group'],
+      enum: ['Post', 'Comment', 'Message', 'Follower', 'Page', 'Group', 'Friend'],
       required: true
     },
     contextId: { type: mongoose.Schema.Types.ObjectId, required: false },
-    content: { type: String, required: true },
+    content: {
+      text: { type: String, required: true },
+      extraInfo: { type: String, required: false }
+    },
     isRead: { type: Boolean, required: true, default: false }
   },
   { timestamps: true }

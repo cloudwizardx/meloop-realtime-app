@@ -11,6 +11,7 @@ const messageSchema = new mongoose.Schema<Message>(
     isEdited: { type: Boolean, required: true, default: false },
     media: [
       {
+        mediaId: { type: mongoose.Types.ObjectId, required: false, ref: 'Media' },
         url: { type: String, required: false },
         type: { type: String, enum: ['Image', 'Video'], required: false },
         size: { type: Number, required: false }

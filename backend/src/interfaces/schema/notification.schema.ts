@@ -6,7 +6,10 @@ export interface Notification {
   receiverIds: Types.ObjectId[]
   contextType: 'Post' | 'Comment' | 'Message' | 'Follower' | 'Page' | 'Group'
   contextId?: Types.ObjectId
-  content: string
+  content: {
+    text: string
+    extraInfo: string
+  }
   isRead: boolean
   createdAt: Date
   updatedAt: Date
