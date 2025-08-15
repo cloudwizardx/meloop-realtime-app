@@ -45,11 +45,14 @@ export const deletedFriendInvitation = async (req: Request, res: Response, next:
   }
 }
 
-export const getListFriendInvitation = async (req: Request, res: Response, next: NextFunction) => {
+export const getListFriends = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new UnauthorizeException('Unauthorize to access!')
     }
+
+    const myFriends = await friendServices.getMyFriends(req.user)
+    res.status(200).json({ data: myFriends })
   } catch (error) {
     console.log(error)
     next(error)
