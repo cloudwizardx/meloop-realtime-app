@@ -8,9 +8,9 @@ const app = express()
 
 app.use(express.json())
 
-app.use('/api/auth', authRoutes)
-app.use('/api/users/me', userRoutes)
-app.use('/api/friends', friendRoute)
+app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/users/me', userRoutes)
+app.use('/api/v1/friends', friendRoute)
 
 app.use(globalErrorHandle)
 
