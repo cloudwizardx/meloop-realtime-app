@@ -101,6 +101,13 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
     }
   }
 
+  if (status === 'Deleted' && loadedInvitation.status === 'Accepted') {
+    return {
+      status: false,
+      message: 'Invitation is accepted, you cannot update to deleted!'
+    }
+  }
+
   await friendModel.updateOne({ _id: inviteId }, { $set: { status: status } })
   return {
     status: true,
