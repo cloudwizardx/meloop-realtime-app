@@ -35,12 +35,8 @@ export const acceptFriendInvitation = async (req: Request, res: Response, next: 
     }
 
     const { inviteId } = req.params
-    const status = typeof req.query.status === 'string' ? req.query.status : undefined
-    if (!status) {
-      return res.status(400).json({ message: 'Status is required and must be a string.' })
-    }
 
-    const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), status)
+    const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), 'Accepted')
     if (result.status) {
       return res.status(201).json({ message: result.message })
     } else {
@@ -56,6 +52,15 @@ export const deletedFriendInvitation = async (req: Request, res: Response, next:
   try {
     if (!req.user) {
       throw new UnauthorizeException('Unauthorize to access!')
+    }
+
+    const { inviteId } = req.params
+
+    const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), 'Deleted')
+    if (result.status) {
+      return res.status(201).json({ message: result.message })
+    } else {
+      return res.status(400).json({ message: result.message })
     }
   } catch (error) {
     console.log(error)

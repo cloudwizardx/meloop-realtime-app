@@ -8,13 +8,18 @@ const router = Router()
 router.post('/:receiverId/invite', protectRoute, requirePermission('add_friend'), friendController.sendFriendInvitation)
 
 router.patch(
-  '/:inviteId/accept',
+  '/:inviteId/accepted',
   protectRoute,
   requirePermission('add_friend'),
   friendController.acceptFriendInvitation
 )
 
-
+router.patch(
+  '/:inviteId/deleted',
+  protectRoute,
+  requirePermission('add_friend'),
+  friendController.deletedFriendInvitation
+)
 
 router.get('/list', protectRoute, friendController.getListFriends)
 
