@@ -85,6 +85,29 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   }
 }
 
+export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, status: string) => {
+  const loadedInvitation = await friendModel.findById(inviteId)
+  if (!loadedInvitation) {
+    return {
+      status: false,
+      message: 'Friend invitation not exist!'
+    }
+  }
+
+  if (!status.match(/^(Accepted|Deleted)$/)) {
+    return {
+      status: false,
+      message: 'Status to update invalid!'
+    }
+  }
+
+  await friendModel.updateOne({ _id: inviteId }, { $set: { status: status } })
+  return {
+    status: true,
+    message: 'Updated status of friend invitation!'
+  }
+}
+
 export const getMyFriends = async (userId: Types.ObjectId): Promise<Friend[]> => {
   const friends = await friendModel.find({ $or: [{ userId: userId }, { friendId: userId }] })
   return friends || []
