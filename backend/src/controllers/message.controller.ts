@@ -48,18 +48,18 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
-export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-  } catch (error) {
-    console.log(error)
-    next(error)
-  }
-}
+// export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//   } catch (error) {
+//     console.log(error)
+//     next(error)
+//   }
+// }
 
-export const updateStatusMessage = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-  } catch (error) {
-    console.log(error)
-    next(error)
-  }
-}
+// export const updateStatusMessage = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//   } catch (error) {
+//     console.log(error)
+//     next(error)
+//   }
+// }
