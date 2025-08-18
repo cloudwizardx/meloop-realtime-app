@@ -4,13 +4,14 @@ export interface Message {
   _id?: Types.ObjectId
   conversationId: Types.ObjectId
   sender: Types.ObjectId
-  type: 'Text' | 'Image' | 'Video'
+  type: ['Text' | 'Media' | 'Audio']
   text: string
   isEdited: boolean
   media?: [
     {
       mediaId: Types.ObjectId
       url: string
+      name: string
       type: 'Image' | 'Video'
       size: number
     }
@@ -18,7 +19,6 @@ export interface Message {
   links?: string[]
   replyTo?: Types.ObjectId
   status: 'Sent' | 'Delivered' | 'Read'
-  sentAt?: Date
   deleted?: boolean
   createdAt?: Date
   updatedAt?: Date
