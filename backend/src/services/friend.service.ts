@@ -4,10 +4,11 @@ import { User } from '~/interfaces/schema/user.schema'
 import friendModel from '~/models/database/friend.model'
 import userModel from '~/models/database/user.model'
 import notificationModel from '~/models/database/notification.model'
-import { notifyFriendInvitationContent } from '~/utils/notification.content'
+import { notifyAcceptedFriendInvitation, notifyFriendInvitationContent } from '~/utils/notification.content'
 import profileModel from '~/models/database/profile.model'
 import { ResourceNotFoundException } from '~/exceptions/resource.not.found.exception'
 import { Friend } from '~/interfaces/schema/friend.schema'
+import { getIo } from '~/libs/socket'
 
 export const createNewFriendInvitation = async (receiverId: Types.ObjectId, currentUser: User) => {
   if (receiverId.equals(currentUser._id)) {
@@ -109,6 +110,29 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
   }
 
   await friendModel.updateOne({ _id: inviteId }, { $set: { status: status } })
+  if (status === 'Accepted') {
+    const loadedSender = await userModel.findById(loadedInvitation.userId)
+    if (loadedSender?.isOnline) {
+      const io = getIo()
+      io.to(loadedSender?._id.toString()).emit('acceptedInvitation', {
+        status: true, message: 'Updated status of friend invitation!'
+      })
+    }
+    const receiver = await userModel.findById(loadedInvitation.friendId)
+    const receiverProfile = await profileModel.findById(receiver?.profile)
+
+    await notificationModel.create({
+      senderId: loadedInvitation.friendId,
+      receiverIds: [loadedInvitation.userId],
+      contextType: 'Friend',
+      contextId: loadedInvitation._id,
+      content: {
+        text: notifyAcceptedFriendInvitation(`${receiverProfile?.firstName} ${receiverProfile?.lastName}`),
+        extraInfo: receiverProfile?.avatar
+      }
+    })
+  }
+
   return {
     status: true,
     message: 'Updated status of friend invitation!'
