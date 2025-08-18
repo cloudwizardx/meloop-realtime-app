@@ -1,5 +1,4 @@
 import { Types } from 'mongoose'
-import { ResourceNotFoundException } from '~/exceptions/resource.not.found.exception'
 import { User } from '~/interfaces/schema/user.schema'
 import messageModel from '~/models/database/message.model'
 import userModel from '~/models/database/user.model'
