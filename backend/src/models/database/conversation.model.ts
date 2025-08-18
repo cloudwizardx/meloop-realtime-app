@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import { Conversation } from '~/interfaces/schema/conversation.schema'
-import { REGEX_LINK_MESSAGE } from '~/utils/app.constant'
 
 const conversationSchema = new mongoose.Schema<Conversation>(
   {
@@ -15,8 +14,7 @@ const conversationSchema = new mongoose.Schema<Conversation>(
       enum: ['Active', 'Blocked'],
       required: true,
       default: 'Active'
-    },
-    links: [{ type: String, match: REGEX_LINK_MESSAGE }]
+    }
   },
   { timestamps: true }
 )

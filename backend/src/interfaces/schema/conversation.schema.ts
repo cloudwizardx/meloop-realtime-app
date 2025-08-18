@@ -9,7 +9,6 @@ export interface Conversation {
   lastMessage?: string
   lastSeen?: Date
   status: 'Active' | 'Blocked'
-  links?: string[]
   createdAt?: Date
   updatedAt?: Date
 }

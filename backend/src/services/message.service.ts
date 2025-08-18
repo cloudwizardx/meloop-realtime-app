@@ -3,13 +3,13 @@ import { User } from '~/interfaces/schema/user.schema'
 import messageModel from '~/models/database/message.model'
 import userModel from '~/models/database/user.model'
 import { uploadToCloudinary } from './upload.service'
-import { FOLDER_CHATTING_RESOURCES, REGEX_LINK_MESSAGE } from '~/utils/app.constant'
-import { Message } from '~/interfaces/schema/message.schema'
+import { REGEX_LINK_MESSAGE } from '~/utils/app.constant'
 import mediaModel from '~/models/database/media.model'
 import notificationModel from '~/models/database/notification.model'
 import profileModel from '~/models/database/profile.model'
 import { notifyNewMessageContent } from '~/utils/notification.content'
 import { getIo } from '~/libs/socket'
+import conversationModel from '~/models/database/conversation.model'
 
 export interface SendMessageParams {
   sender: User
@@ -22,12 +22,11 @@ export interface SendMessageParams {
   }[]
   folder: string
   receiverId: Types.ObjectId
-  conversationId: Types.ObjectId
 }
 
 export const sendMessageTo = async (requestSendMessage: SendMessageParams) => {
   const loadedReceiver = await userModel.findById(requestSendMessage.receiverId)
-  const loadedProfileReceiver = await profileModel.findById(loadedReceiver?._id)
+  const loadedProfileReceiver = await profileModel.findById(loadedReceiver?.profile)
   if (!loadedReceiver) {
     return {
       status: false,
@@ -35,14 +34,18 @@ export const sendMessageTo = async (requestSendMessage: SendMessageParams) => {
     }
   }
 
-  const newMessage: Message = await messageModel.create({
-    conversationId: requestSendMessage.conversationId,
-    sender: requestSendMessage.sender._id,
-    text: requestSendMessage.text,
-    type: ['Text']
-  } as Message)
+  let conversation = await conversationModel.findOne({
+    members: { $all: [requestSendMessage.sender._id, loadedReceiver._id] }
+  })
 
-  const mediaFiles: {
+  if (!conversation) {
+    conversation = await conversationModel.create({
+      members: [requestSendMessage.sender._id, loadedReceiver._id],
+    })
+  }
+
+  const messageTypes: string[] = []
+  let mediaFiles: {
     mediaId: Types.ObjectId
     url?: string
     name?: string
@@ -50,37 +53,52 @@ export const sendMessageTo = async (requestSendMessage: SendMessageParams) => {
     size?: number
   }[] = []
 
-  const links: string[] = []
   if (requestSendMessage.files.length > 0) {
-    for (const file of requestSendMessage.files) {
-      const result = await uploadToCloudinary(file.buffers, FOLDER_CHATTING_RESOURCES)
-      const savedMedia = await mediaModel.create({
-        contextType: 'Message',
-        contextId: newMessage._id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        secureUrl: (result as any).secure_url,
-        folder: requestSendMessage.folder,
-        fileName: file.fileName,
-        fileType: file.fileType,
-        size: file.fileSize
-      })
-      mediaFiles.push({
-        mediaId: savedMedia._id,
-        url: savedMedia.secureUrl,
-        name: savedMedia.fileName,
-        type: savedMedia.fileType,
-        size: savedMedia.size
-      })
-    }
+    const uploadFiles = requestSendMessage.files.map((file) => {
+      return (async () => {
+        const result = await uploadToCloudinary(file.buffers, requestSendMessage.folder)
+        const savedMedia = await mediaModel.create({
+          contextType: 'Message',
+          contextId: null,
+          secureUrl: (result as any).secure_url,
+          folder: requestSendMessage.folder,
+          fileName: file.fileName,
+          fileType: file.fileType,
+          size: file.fileSize
+        })
+
+        return {
+          value: {
+            mediaId: savedMedia._id,
+            url: savedMedia.secureUrl,
+            name: savedMedia.fileName,
+            type: savedMedia.fileType,
+            size: savedMedia.size
+          }
+        }
+      })()
+    })
+
+    const results = await Promise.allSettled(uploadFiles)
+    mediaFiles = results.filter((f) => f.status === 'fulfilled').map((r) => (r as PromiseFulfilledResult<any>).value)
   }
 
-  const regexLinks = newMessage.text.match(REGEX_LINK_MESSAGE) || []
-  if (regexLinks?.length > 0) regexLinks.forEach((x) => links.push(x))
-  if (mediaFiles.length > 0) newMessage.type.push('Media')
+  const regexLinks = requestSendMessage.text.match(REGEX_LINK_MESSAGE) || []
+  if (requestSendMessage.text.length > 0) messageTypes.push('Text')
+  if (mediaFiles.length > 0) messageTypes.push('Media')
 
-  await messageModel.updateOne(
-    { _id: newMessage._id },
-    { $set: { media: mediaFiles, links: regexLinks, type: newMessage.type } }
+  const newMessage = await messageModel.create({
+    conversationId: conversation._id,
+    sender: requestSendMessage.sender._id,
+    text: requestSendMessage.text,
+    type: messageTypes,
+    media: mediaFiles,
+    links: regexLinks
+  })
+
+  await mediaModel.updateMany(
+    { _id: { $in: mediaFiles.map((x) => x.mediaId) } },
+    { $set: { contextId: newMessage._id } }
   )
 
   if (!loadedReceiver.isOnline) {

@@ -11,7 +11,6 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
     }
 
     const { text, receiverId } = req.body
-    const { conversationId } = req.params
     const mediaFiles: {
       fileName: string
       fileType: string
@@ -21,7 +20,12 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
 
     if (Array.isArray(req.files) && req.files.length > 0) {
       for (const file of req.files) {
-        mediaFiles.push({ fileName: file.filename, fileType: file.mimetype, fileSize: file.size, buffers: file.buffer })
+        mediaFiles.push({
+          fileName: file.originalname,
+          fileType: file.mimetype,
+          fileSize: file.size,
+          buffers: file.buffer
+        })
       }
     }
 
@@ -30,8 +34,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
       text: text,
       files: mediaFiles,
       folder: FOLDER_CHATTING_RESOURCES,
-      receiverId: new Types.ObjectId(receiverId),
-      conversationId: new Types.ObjectId(conversationId)
+      receiverId: new Types.ObjectId(receiverId)
     })
 
     if (result.status) {

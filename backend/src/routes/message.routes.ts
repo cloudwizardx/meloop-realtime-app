@@ -7,7 +7,7 @@ import * as messageController from '~/controllers/message.controller'
 const router = Router()
 
 router.post(
-  '/:conversationId/send',
+  '/send',
   protectRoute,
   requirePermission('send_message'),
   upload.array('files'),
