@@ -5,7 +5,12 @@ const conversationSchema = new mongoose.Schema<Conversation>(
   {
     isGroupChat: { type: Boolean, required: true, default: false },
     name: { type: String, required: false },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+    members: [
+      {
+        memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        nickname: { type: String, required: false }
+      }
+    ],
     ownerNameLastMessage: { type: String, required: false },
     lastMessage: { type: String, required: false },
     lastSeen: { type: Date, required: false },

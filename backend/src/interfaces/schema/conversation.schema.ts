@@ -4,7 +4,10 @@ export interface Conversation {
   _id?: Types.ObjectId
   isGroupChat: boolean
   name?: string
-  members?: Types.ObjectId[]
+  members?: {
+    memberId: Types.ObjectId
+    nickname: string
+  }[]
   ownerNameLastMessage?: string
   lastMessage?: string
   lastSeen?: Date
