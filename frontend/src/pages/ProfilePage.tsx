@@ -10,6 +10,8 @@ import {
   UserRoundIcon as UserRoundPen,
   MapPinIcon as MapPinHouse,
   Eye,
+  CirclePlus,
+  SquarePen,
 } from "lucide-react"
 import { Header } from "../components/Header"
 import { SideBar } from "../components/Sidebar"
@@ -76,13 +78,13 @@ export const ProfilePage = () => {
                         </div>
                       </div>
                       <div className="flex gap-3 pb-2">
-                        <button className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium">
-                          <MessageCircle className="w-4 h-4" />
-                          Message
+                        <button className="flex items-center gap-2 px-6 py-2.5 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-medium">
+                          <CirclePlus className="w-4 h-4" />
+                          Add the moment
                         </button>
                         <button className="flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
-                          <ThumbsUp className="w-4 h-4" />
-                          Follow
+                          <SquarePen className="w-4 h-4" />
+                          Edit profile
                         </button>
                         <button className="p-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                           <MoreHorizontal className="w-4 h-4" />
@@ -96,19 +98,19 @@ export const ProfilePage = () => {
                 <div className="bg-white rounded-2xl shadow-sm p-2">
                   <div className="flex gap-1">
                     <button className="flex-1 py-3 px-4 text-indigo-600 bg-indigo-50 rounded-xl font-medium text-sm transition-colors">
-                      Timeline
+                      Posts
                     </button>
                     <button className="flex-1 py-3 px-4 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl font-medium text-sm transition-colors">
                       About
                     </button>
                     <button className="flex-1 py-3 px-4 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl font-medium text-sm transition-colors">
-                      Photos
+                      Friends
                     </button>
                     <button className="flex-1 py-3 px-4 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl font-medium text-sm transition-colors">
-                      Videos
+                      Images & Videos
                     </button>
                     <button className="flex-1 py-3 px-4 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl font-medium text-sm transition-colors">
-                      Reviews
+                      Groups
                     </button>
                   </div>
                 </div>
@@ -140,7 +142,7 @@ export const ProfilePage = () => {
                             <span className="font-medium">Video</span>
                           </button>
                         </div>
-                        <button className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium">
+                        <button className="px-6 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-medium">
                           Post
                         </button>
                       </div>
