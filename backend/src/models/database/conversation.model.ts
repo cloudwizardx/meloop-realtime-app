@@ -9,6 +9,8 @@ const conversationSchema = new mongoose.Schema<Conversation>(
     ownerNameLastMessage: { type: String, required: false },
     lastMessage: { type: String, required: false },
     lastSeen: { type: Date, required: false },
+    theme: { type: String, required: false },
+    emotionSymbol: { type: String, required: false },
     status: {
       type: String,
       enum: ['Active', 'Blocked'],

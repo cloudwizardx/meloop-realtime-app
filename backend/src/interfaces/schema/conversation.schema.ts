@@ -8,6 +8,8 @@ export interface Conversation {
   ownerNameLastMessage?: string
   lastMessage?: string
   lastSeen?: Date
+  theme: string
+  emotionSymbol: string
   status: 'Active' | 'Blocked'
   createdAt?: Date
   updatedAt?: Date
