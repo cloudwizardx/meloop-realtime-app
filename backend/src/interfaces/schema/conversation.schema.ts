@@ -6,7 +6,7 @@ export interface Conversation {
   name?: string
   members?: {
     memberId: Types.ObjectId
-    nickname: string
+    nickname?: string
   }[]
   ownerNameLastMessage?: string
   lastMessage?: string

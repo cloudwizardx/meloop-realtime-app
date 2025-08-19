@@ -35,12 +35,14 @@ export const sendMessageTo = async (requestSendMessage: SendMessageParams) => {
   }
 
   let conversation = await conversationModel.findOne({
-    members: { $all: [requestSendMessage.sender._id, loadedReceiver._id] }
+    $and: [{ 'members.memberId': requestSendMessage.sender._id }, { 'members.memberId': loadedReceiver._id }],
+    isGroupChat: false
   })
 
   if (!conversation) {
     conversation = await conversationModel.create({
-      members: [requestSendMessage.sender._id, loadedReceiver._id],
+      members: [{ memberId: requestSendMessage.sender._id }, { memberId: loadedReceiver._id }],
+      isGroupChat: false
     })
   }
 
