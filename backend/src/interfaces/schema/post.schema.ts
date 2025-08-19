@@ -7,6 +7,7 @@ export interface Post {
   contextType: 'Group' | 'Page' | 'Personal' // group, page, personal
   contextId?: Types.ObjectId // groupId, pageId
   createdBy: Types.ObjectId
+  access?: 'Private' | 'Friend' | 'Public'
   likesCount: number
   sharesCount: number
   commentsCount: number

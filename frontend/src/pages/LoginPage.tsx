@@ -3,6 +3,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useState } from "react"
 import meloopLogo from '../assets/meloop_logo.png'
 import googleLogo from '../assets/google_logo.webp'
+import Button from "../components/Button"
 
 export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -21,7 +22,7 @@ export const LoginPage = () => {
           <form className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign In</h2>
-              <div className="max-w-4/12 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
+              <div className="max-w-4/12 h-0.5 bg-gradient-to-r from-orange-600 to-yellow-600 mx-auto rounded-full"></div>
             </div>
 
             <div className="space-y-4">
@@ -84,13 +85,7 @@ export const LoginPage = () => {
                 Forgot password?
               </Link>
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              Sign In
-            </button>
+            <Button type="submit" variant="primary">Sign In</Button>
           </form>
 
           <div className="relative my-6">

@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema<Post>(
     contextId: { type: mongoose.Schema.Types.ObjectId, required: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     likesCount: { type: Number, required: true, default: 0 },
+    access: { type: String, enum: ['Private', 'Friend', 'Public'], required: false },
     sharesCount: { type: Number, required: true, default: 0 },
     commentsCount: { type: Number, required: true, default: 0 },
     isEdit: { type: Boolean, required: true, default: false }
