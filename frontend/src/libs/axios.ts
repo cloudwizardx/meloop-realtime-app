@@ -1,82 +1,81 @@
 import axios from "axios"
+import { clearAuth, getAccessToken, refreshToken } from "../services/TokenService"
 
 export const axiosInstance = axios.create({
     baseURL: 'http://localhost:5001/api/v1',
     timeout: 10000,
     withCredentials: true 
-});
+})
 
+let isRefreshing = false
+let refreshSubscribers: ((token: string) => void)[] = []
 
-// ===== Refresh Queue (chống gọi nhiều lần) =====
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+const subscribeTokenRefresh = (cb: (token: string | null) => void) => {
+  refreshSubscribers.push(cb)
+}
 
-const subscribeTokenRefresh = (cb: (token: string) => void) => {
-  refreshSubscribers.push(cb);
-};
-
-const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.forEach((cb) => cb(token));
-  refreshSubscribers = [];
-};
+const onTokenRefreshed = (token: string | null) => {
+  refreshSubscribers.forEach((cb) => cb(token ?? ''))
+  refreshSubscribers = []
+}
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
+    const token = getAccessToken()
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
   (error) => Promise.reject(error)
-);
+)
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      const isAuthEndpoint = originalRequest.url?.includes("/auth/");
-      if (isAuthEndpoint) return Promise.reject(error);
+      const isAuthEndpoint = originalRequest.url?.includes("/auth/")
+      if (isAuthEndpoint) return Promise.reject(error)
 
-      originalRequest._retry = true;
+      originalRequest._retry = true
 
       if (isRefreshing) {
         return new Promise((resolve) => {
-          subscribeTokenRefresh((token: string) => {
+          subscribeTokenRefresh((token: string | null) => {
             if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
+              originalRequest.headers.Authorization = `Bearer ${token ?? ''}`
             }
-            resolve(axiosInstance(originalRequest));
-          });
-        });
+            resolve(axiosInstance(originalRequest))
+          })
+        })
       }
 
-      isRefreshing = true;
+      isRefreshing = true
       try {
-        await refreshToken();
-        const newToken = getAccessToken();
-        isRefreshing = false;
+        await refreshToken()
+        const newToken = getAccessToken()
+        isRefreshing = false
 
         if (newToken) {
-          onTokenRefreshed(newToken);
+          onTokenRefreshed(newToken)
           if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            originalRequest.headers.Authorization = `Bearer ${newToken}`
           }
-          return axiosInstance(originalRequest);
+          return axiosInstance(originalRequest)
         }
       } catch (err) {
-        isRefreshing = false;
-        refreshSubscribers = [];
-        clearAuth();
+        isRefreshing = false
+        refreshSubscribers = []
+        clearAuth()
         if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
-          window.location.href = "/login";
+          window.location.href = "/login"
         }
-        return Promise.reject(err);
+        return Promise.reject(err)
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
