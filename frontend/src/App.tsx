@@ -6,7 +6,7 @@ import { VisitUserProfilePage } from "./pages/VisitUserProfilePage"
 
 
 function App() {
-  return (<VisitUserProfilePage></VisitUserProfilePage>)
+  return (<LoginPage></LoginPage>)
 }
 
 export default App
