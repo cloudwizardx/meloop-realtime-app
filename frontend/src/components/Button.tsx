@@ -16,7 +16,7 @@ const Button: React.FC<ButtonProps> = ({
   variant = "primary",
 }) => {
   const baseStyles =
-    "w-full text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-4";
+    "w-full text-white py-3 px-4 cursor-pointer rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-4";
 
   const variants = {
     primary:

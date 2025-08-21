@@ -13,6 +13,7 @@ export const useAuthStore = create<AuthState>()(
         isLoggingIn: false,
         isCheckingAuth: false,
         isRefreshingToken: false,
+        isAuthenticated: false,
         error: null,
 
         setAccessToken: (token: string | null) => {
@@ -71,21 +72,21 @@ export const useAuthStore = create<AuthState>()(
         },
 
         login: async (data) => {
-            set({isLoggingIn: true, error: null})
+            set({ isLoggingIn: true, error: null })
             try {
                 const res = await axiosInstance.post('/auth/login', {
                     data
                 })
-                if (res) {
-                    const {accessToken} = res.data
-                    get().setAccessToken(accessToken)
-                    toast.success('Logged in successfully')
-                }
-            } catch(error: any) {
+
+                const { accessToken, isAuthenticated } = res.data
+                get().setAccessToken(accessToken)
+                set({ isAuthenticated: isAuthenticated })
+                return isAuthenticated
+            } catch (error: any) {
                 const message = error.response?.data?.message || 'Login failed'
-                set({error: message})
+                set({ error: message })
                 toast.error(message)
-            }   
+            }
         },
 
         logout: async () => {
@@ -93,7 +94,7 @@ export const useAuthStore = create<AuthState>()(
                 await axiosInstance.post('/auth/logout')
                 get().clearAuth()
                 toast.success('Logged out successfully')
-            } catch(error: any) {
+            } catch (error: any) {
                 toast.error(error.response?.data?.message || 'Logout failed')
                 get().clearAuth()
             }

@@ -3,8 +3,7 @@ import { clearAuth, getAccessToken, refreshToken } from "../services/TokenServic
 
 export const axiosInstance = axios.create({
     baseURL: 'http://localhost:5001/api/v1',
-    timeout: 10000,
-    withCredentials: true 
+    withCredentials: true
 })
 
 let isRefreshing = false

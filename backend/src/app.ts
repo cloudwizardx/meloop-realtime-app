@@ -3,18 +3,29 @@ import { globalErrorHandle } from '~/middlewares/error.middleware'
 import authRoutes from '~/routes/auth.routes'
 import userRoutes from '~/routes/user.routes'
 import friendRoute from '~/routes/friend.routes'
-import messageRoute  from '~/routes/message.routes'
+import messageRoute from '~/routes/message.routes'
 import http from 'http'
 import { Server } from 'socket.io'
 import { initSocket } from '~/libs/socket'
+import cors from 'cors'
 
 const app = express()
-const server = http.createServer(app)
-const io = new Server(server, {
-  cors: { origin: [process.env.FRONTEND_PATH ?? '*'] }
-})
-
 app.use(express.json())
+app.use(
+  cors({
+    origin: process.env.FRONTEND_PATH ?? 'http://localhost:5173',
+    credentials: true
+  })
+)
+const server = http.createServer(app)
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_PATH ?? 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  }
+})
 initSocket(io)
 
 app.use('/api/v1/auth', authRoutes)

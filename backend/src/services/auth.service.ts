@@ -68,21 +68,22 @@ export const verifyEmail = async (token: string) => {
   }
 }
 
-export const loginWithCredentials = async (request: LoginRequest) => {
-  const loadedUser = await UserModel.findOne({ email: request.email })
+export const loginWithCredentials = async (email: string, password: string) => {
+  console.log(email, password)
+  const loadedUser = await UserModel.findOne({ email: email })
   if (!loadedUser) {
-    throw new Error(`User with email ${request.email} not exists or is not active`)
+    throw new Error(`User with email ${email} not exists or is not active`)
   }
 
   if (!loadedUser.isEmailVerified) {
-    throw new UnverifiedEmail(`${request.email} is not verified`)
+    throw new UnverifiedEmail(`${email} is not verified`)
   }
 
   if (!loadedUser.isActive) {
-    throw new AccountBlockedException(`User with email ${request.email} is blocked`)
+    throw new AccountBlockedException(`User with email ${email} is blocked`)
   }
 
-  const isMatchedPassword = await bcrypt.compareSync(request.password, loadedUser.password)
+  const isMatchedPassword = await bcrypt.compareSync(password, loadedUser.password)
   if (!isMatchedPassword) {
     throw new InvalidCredentialException()
   }

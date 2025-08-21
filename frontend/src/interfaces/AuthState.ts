@@ -7,6 +7,7 @@ export interface AuthState {
   isLoggingIn: boolean
   isCheckingAuth: boolean
   isRefreshingToken: boolean
+  isAuthenticated: boolean
   error: string | null
 
   setAccessToken: (token: string | null) => void

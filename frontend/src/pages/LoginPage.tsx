@@ -1,33 +1,54 @@
-import { Link } from "react-router-dom"
-import { Eye, EyeOff, Mail, Lock } from "lucide-react"
-import { useState } from "react"
-import meloopLogo from '../assets/meloop_logo.png'
-import googleLogo from '../assets/google_logo.webp'
-import Button from "../components/Button"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useState } from "react";
+import meloopLogo from "../assets/meloop_logo.png";
+import googleLogo from "../assets/google_logo.webp";
+import Button from "../components/Button";
+import { useAuthStore } from "../stores/AuthStore";
+import { toast } from "react-toastify";
 
 export const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const login = useAuthStore((state) => state.login);
+
+  async function handleLogin() {
+    const isAuthenticated: any = await login({
+      email,
+      password,
+    });
+    if (isAuthenticated) {
+      toast.success("Logged in successfully");
+      navigate("home");
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md">
         <div className="text-center flex justify-center">
-          <img src={meloopLogo} alt="" className="max-w-2/5"/>
+          <img src={meloopLogo} alt="" className="max-w-2/5" />
         </div>
 
         <div className="bg-gray-10 rounded-2xl shadow-xl border border-gray-100 p-8">
-          <form className="space-y-6">
+          <section className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign In</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                Sign In
+              </h2>
               <div className="max-w-4/12 h-0.5 bg-gradient-to-r from-orange-600 to-yellow-600 mx-auto rounded-full"></div>
             </div>
 
             <div className="space-y-4">
               <div className="relative">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Email Address
                 </label>
                 <div className="relative">
@@ -44,7 +65,10 @@ export const LoginPage = () => {
               </div>
 
               <div className="relative">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -62,7 +86,11 @@ export const LoginPage = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -85,27 +113,39 @@ export const LoginPage = () => {
                 Forgot password?
               </Link>
             </div>
-            <Button type="submit" variant="primary">Sign In</Button>
-          </form>
+            <Button type="submit" variant="primary" onClick={handleLogin}>
+              Sign In
+            </Button>
+          </section>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">Or continue with</span>
+              <span className="px-4 bg-white text-gray-500 font-medium">
+                Or continue with
+              </span>
             </div>
           </div>
 
           <button className="w-full flex items-center justify-center space-x-3 py-3 px-4 border border-gray-300 rounded-xl hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all duration-200 group">
-            <img src={googleLogo} className="w-5 h-5 text-gray-600 group-hover:text-gray-700" />
-            <span className="font-medium text-gray-700 group-hover:text-gray-800">Sign in with Google</span>
+            <img
+              src={googleLogo}
+              className="w-5 h-5 text-gray-600 group-hover:text-gray-700"
+            />
+            <span className="font-medium text-gray-700 group-hover:text-gray-800">
+              Sign in with Google
+            </span>
           </button>
 
           <div className="text-center mt-6 pt-4 border-t border-gray-100">
             <p className="text-gray-600">
               Don't have an account?{" "}
-              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+              <Link
+                to="/register"
+                className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+              >
                 Sign up for free
               </Link>
             </p>
@@ -117,5 +157,5 @@ export const LoginPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
