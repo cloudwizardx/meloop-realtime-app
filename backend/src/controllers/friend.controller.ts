@@ -88,7 +88,10 @@ export const getInvitationList = async (req: Request, res: Response, next: NextF
       throw new UnauthorizeException('Unauthorize to access!')
     }
 
-    const res = await friendServices.getFriendRequestsList(req.user)
+    const result = await friendServices.getFriendRequestsList(req.user)
+    res.status(200).json({
+      data: result
+    })
   } catch (error) {
     console.log(error)
     next(error)

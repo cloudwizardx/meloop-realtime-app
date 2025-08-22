@@ -49,6 +49,7 @@ export const USER_PERMISSIONS = {
   ADD_FRIEND: 'add_friend',
   REMOVE_FRIEND: 'remove_friend',
   FOLLOW_USER: 'follow_user',
+  VIEW_FRIEND_MY_REQUESTS: 'view_my_friend_request',
   UNFOLLOW_USER: 'unfollow_user',
   BLOCK_USER: 'block_user',
   VIEW_FRIEND_POSTS: 'view_friend_posts',
