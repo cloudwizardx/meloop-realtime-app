@@ -20,10 +20,11 @@ export const LoginPage = () => {
     const isAuthenticated: any = await login({
       email,
       password,
-    });
+    })
+    console.log(isAuthenticated)
     if (isAuthenticated) {
       toast.success("Logged in successfully");
-      navigate("home");
+      navigate("/");
     }
   }
 

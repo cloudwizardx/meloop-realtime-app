@@ -1,6 +1,7 @@
 import { Cake, FolderHeart, Library, Link, Play, UserRound, UsersRound, UserX } from "lucide-react";
 
 export const SideBar = () => {
+  
   return (
     <div>
       <aside className="w-80 fixed left-4 top-20 h-[calc(100vh-5rem)] overflow-y-auto scrollbar-hide">

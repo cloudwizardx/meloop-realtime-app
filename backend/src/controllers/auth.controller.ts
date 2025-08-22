@@ -19,10 +19,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log(req.body)
     const { email, password } = req.body.data
-    console.log(`Request: ${email} ${password}`)
-    const { accessToken, refreshToken } = await loginWithCredentials(email, password)
+    const { accessToken, refreshToken, user, profile } = await loginWithCredentials(email, password)
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -32,7 +30,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     })
     res.status(200).json({
       accessToken: accessToken,
-      isAuthenticated: true
+      isAuthenticated: true,
+      user: user,
+      profile: profile
     })
   } catch (error) {
     next(error)

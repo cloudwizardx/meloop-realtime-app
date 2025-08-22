@@ -79,6 +79,7 @@ export const useAuthStore = create<AuthState>()(
                 })
 
                 const { accessToken, isAuthenticated } = res.data
+                console.log(accessToken, isAuthenticated)
                 get().setAccessToken(accessToken)
                 set({ isAuthenticated: isAuthenticated })
                 return isAuthenticated

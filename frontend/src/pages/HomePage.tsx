@@ -8,8 +8,12 @@ import {
 } from "lucide-react";
 import { SideBar } from "../components/Sidebar";
 import { Header } from "../components/Header";
+import { useAuthStore } from "../stores/AuthStore";
 
 export const HomePage = () => {
+  const user = useAuthStore.getState().authUser;
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

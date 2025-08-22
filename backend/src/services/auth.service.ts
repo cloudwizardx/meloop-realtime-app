@@ -16,6 +16,8 @@ import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
 import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 import jwt from 'jsonwebtoken'
+import profileModel from '~/models/database/profile.model'
+import userModel from '~/models/database/user.model'
 
 export const registerNewUser = async (body: RegisterRequest) => {
   const existingUser = await UserModel.findOne({ email: body.email })
@@ -69,7 +71,6 @@ export const verifyEmail = async (token: string) => {
 }
 
 export const loginWithCredentials = async (email: string, password: string) => {
-  console.log(email, password)
   const loadedUser = await UserModel.findOne({ email: email })
   if (!loadedUser) {
     throw new Error(`User with email ${email} not exists or is not active`)
@@ -97,6 +98,9 @@ export const loginWithCredentials = async (email: string, password: string) => {
     { new: true }
   )
 
+  const profile = await profileModel.findById(loadedUser.profile)
+  const user = await userModel.findById(loadedUser._id).select('--password')
+
   const accessToken = signAccessToken({
     userId: savedUser?._id?.toString(),
     levelMember: savedUser?.levelMember,
@@ -112,7 +116,9 @@ export const loginWithCredentials = async (email: string, password: string) => {
 
   return {
     accessToken,
-    refreshToken
+    refreshToken,
+    user,
+    profile
   }
 }
 
