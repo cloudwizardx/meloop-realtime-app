@@ -1,6 +1,12 @@
 import { Cake, FolderHeart, Library, Link, Play, UserRound, UsersRound, UserX } from "lucide-react";
+import type { Profile } from "../interfaces/Profile";
+import { convertFullName } from "../libs/CommonFunctions";
 
-export const SideBar = () => {
+interface SideBarProps {
+  profile: Profile | null
+}
+
+export const LeftSideBar = ({ profile }: SideBarProps) => {
   
   return (
     <div>
@@ -9,11 +15,11 @@ export const SideBar = () => {
           {/* User Profile */}
           <div className="flex items-center space-x-3 mb-6 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
             <img
-              src="https://avatar.iran.liara.run/public/21"
+              src={profile?.avatar}
               alt="Profile"
               className="w-10 h-10 rounded-full"
             />
-            <span className="font-semibold text-gray-900">Nguyen Khai</span>
+            <span className="font-semibold text-gray-900">{convertFullName(profile??null)}</span>
           </div>
 
           {/* Navigation Menu */}
@@ -23,25 +29,28 @@ export const SideBar = () => {
               {
                 icon: UsersRound,
                 label: "Groups",
+                path: '/friends',
                 color: "text-green-600",
               },
-              { icon: Library, label: "Pages", color: "text-purple-600" },
-              { icon: Play, label: "Short Videos", color: "text-red-600" },
+              { icon: Library, label: "Pages", path: '/pages', color: "text-purple-600" },
+              { icon: Play, label: "Short Videos", path: '/short-videos' , color: "text-red-600" },
               {
                 icon: FolderHeart,
                 label: "Favorites",
+                path: '/favorites',
                 color: "text-pink-600",
               },
-              { icon: UserX, label: "Black List", color: "text-gray-600" },
-              { icon: Cake, label: "Birth days", color: "text-yellow-600" },
+              { icon: UserX, label: "Black List", path: '/black-users', color: "text-gray-600" },
+              { icon: Cake, label: "Birth days", path: '/friends/birth-days', color: "text-yellow-600" },
             ].map((item, index) => (
-              <div
+              <Link
                 key={index}
+                to={item.path}
                 className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
               >
                 <item.icon className={`w-5 h-5 ${item.color}`} />
                 <span className="text-gray-700 font-medium">{item.label}</span>
-              </div>
+              </Link>
             ))}
           </nav>
         </div>

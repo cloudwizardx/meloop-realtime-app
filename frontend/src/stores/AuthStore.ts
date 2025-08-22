@@ -9,6 +9,7 @@ import { axiosInstance } from '../libs/Axios'
 export const useAuthStore = create<AuthState>()(
     subscribeWithSelector((set, get) => ({
         authUser: null,
+        authProfile: null,
         accessToken: null,
         isLoggingIn: false,
         isCheckingAuth: false,
@@ -78,10 +79,9 @@ export const useAuthStore = create<AuthState>()(
                     data
                 })
 
-                const { accessToken, isAuthenticated } = res.data
-                console.log(accessToken, isAuthenticated)
+                const { accessToken, isAuthenticated, user, profile } = res.data
                 get().setAccessToken(accessToken)
-                set({ isAuthenticated: isAuthenticated })
+                set({ isAuthenticated: isAuthenticated, authUser: user, authProfile: profile })
                 return isAuthenticated
             } catch (error: any) {
                 const message = error.response?.data?.message || 'Login failed'

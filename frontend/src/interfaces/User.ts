@@ -1,11 +1,10 @@
-import type { Profile } from "./Profile"
 
 export interface User {
   _id?: string
   email: string
   isEmailVerified: boolean
   isPhoneVerified: boolean
-  profile: Profile
+  profile: string
   isOnline: boolean
   isActive: boolean
   role: 'User' | 'Admin' | 'Moderator' // User roles

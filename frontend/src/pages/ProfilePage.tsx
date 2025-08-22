@@ -14,7 +14,7 @@ import {
   SquarePen,
 } from "lucide-react"
 import { Header } from "../components/Header"
-import { SideBar } from "../components/Sidebar"
+import { SideBar } from "../components/LeftSidebar"
 
 export const ProfilePage = () => {
   return (

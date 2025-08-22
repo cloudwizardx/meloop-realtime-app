@@ -1,8 +1,10 @@
+import type { Profile } from "./Profile";
 import type { User } from "./User";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface AuthState {
   authUser: User | null
+  authProfile: Profile | null
   accessToken: string | null
   isLoggingIn: boolean
   isCheckingAuth: boolean
