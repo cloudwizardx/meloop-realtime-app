@@ -1,5 +1,8 @@
-import { FriendSideBar } from '../components/FriendSideBar';
+import { FriendSideBar } from '../components/FriendSideBar'
 export const FriendPage = () => {
+
+  // user - profile/ list user common
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       {/* Friend Requests Section */}
@@ -9,7 +12,7 @@ export const FriendPage = () => {
       <section className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">Friend Requests</h2>
-          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">See All</button>
+          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">View All</button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

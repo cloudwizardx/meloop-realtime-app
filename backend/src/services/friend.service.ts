@@ -9,6 +9,9 @@ import profileModel from '~/models/database/profile.model'
 import { ResourceNotFoundException } from '~/exceptions/resource.not.found.exception'
 import { Friend } from '~/interfaces/schema/friend.schema'
 import { getIo } from '~/libs/socket'
+import { FriendRequest } from '~/interfaces/dtos/friend.request'
+import redisClient from '~/configs/redis.config'
+import { Profile } from '~/interfaces/schema/profile.schema'
 
 export const createNewFriendInvitation = async (receiverId: Types.ObjectId, currentUser: User) => {
   if (receiverId.equals(currentUser._id)) {
@@ -115,7 +118,8 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
     if (loadedSender?.isOnline) {
       const io = getIo()
       io.to(loadedSender?._id.toString()).emit('acceptedInvitation', {
-        status: true, message: 'Updated status of friend invitation!'
+        status: true,
+        message: 'Updated status of friend invitation!'
       })
     }
     const receiver = await userModel.findById(loadedInvitation.friendId)
@@ -142,4 +146,66 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
 export const getMyFriends = async (userId: Types.ObjectId): Promise<Friend[]> => {
   const friends = await friendModel.find({ $or: [{ userId: userId }, { friendId: userId }] })
   return friends || []
+}
+
+export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]> => {
+  const friendRequests = await friendModel.find({
+    $or: [{ userId: user._id }, { friendId: user._id }],
+    status: 'Pending'
+  })
+
+  const myFriends = await friendModel
+    .find({ $or: [{ userId: user._id }, { friendId: user._id }], status: 'Accepted' })
+    .lean()
+
+  const myFriendIds = myFriends.map((f) => (f.userId.equals(user._id) ? f.friendId : f.userId))
+
+  await redisClient.sAdd(
+    `friends:${user._id}`,
+    myFriendIds.map((id) => id.toString())
+  )
+
+  const res: FriendRequest[] = []
+
+  for (const request of friendRequests) {
+    const friendId = request.userId.equals(user._id) ? request.friendId : request.userId
+    const loadFriend = await userModel.findById(friendId).select('-password').populate<{ profile: Profile }>('profile')
+    const loadFriends = await friendModel
+      .find({ $or: [{ userId: friendId }, { friendId: friendId }], status: 'Accepted' })
+      .lean()
+
+    const friendIds = loadFriends.map((f) => (f.userId.equals(friendId) ? f.friendId : f.userId))
+    await redisClient.sAdd(
+      `friends:${friendId}`,
+      friendIds.map((id) => id.toString())
+    )
+
+    const mutualList: string[] = await redisClient.sInter([`friends:${user._id}`, `friends:${friendId}`])
+    const previewIds = mutualList.slice(-3).map((x) => new Types.ObjectId(x))
+    const mutualPreview = await userModel
+      .find({ _id: { $in: previewIds } })
+      .select('_id profile')
+      .populate<{ profile: Pick<Profile, '_id' | 'avatar'> }>('profile')
+
+    const mutualPreviewList: {
+      userId: Types.ObjectId
+      profile: Types.ObjectId | undefined
+      avatar: string
+    }[] = mutualPreview.map((x) => ({
+      userId: x._id,
+      profile: x.profile._id,
+      avatar: x.profile.avatar
+    }))
+
+    res.push({
+      sender: {
+        user: loadFriend!,
+        profile: loadFriend!.profile
+      },
+      mutualCount: mutualList.length,
+      mutualPreview: mutualPreviewList
+    })
+  }
+
+  return res
 }

@@ -14,28 +14,27 @@ import {
   SquarePen,
 } from "lucide-react"
 import { Header } from "../components/Header"
-import { SideBar } from "../components/LeftSidebar"
 
 export const ProfilePage = () => {
   return (
-    <div className="min-h-full bg-gray-50">
+    <div className="min-w-full max-h-full bg-gray-50">
       {/* Header */}
       <Header />
 
       {/* Sidebar */}
       <div className="pt-16 max-w-7xl mx-auto px-4">
         <div className="flex ">
-          <SideBar />
+          {/* <LeftSideBar /> */}
 
           {/* Main Content */}
-          <main className="ml-65 max-w-full mx-auto">
+          <main className="min-w-full mx-auto">
             <div className="flex gap-8 p-4">
               {/* Profile Content */}
               <div className="flex-1 max-w-full space-y-6">
                 {/* Cover Photo & Profile Section */}
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                   {/* Cover Photo */}
-                  <div className="relative h-95 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+                  <div className="relative h-140 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
                     <img
                       src="https://thuvienanime.net/wp-content/uploads/2025/07/van-tham-bat-tri-mong-veiled-dreams-thuvienanime-17.jpg"
                       alt="Cover"
@@ -49,7 +48,7 @@ export const ProfilePage = () => {
                   </div>
 
                   {/* Profile Info */}
-                  <div className="relative px-8 pb-8">
+                  <div className="relative px-10 pb-8">
                     <div className="flex items-end justify-between -mt-16">
                       <div className="flex items-start gap-6 flex-col">
                         <div className="relative">

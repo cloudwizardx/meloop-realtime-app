@@ -10,7 +10,9 @@ const friendSchema = new mongoose.Schema<Friend>(
       enum: ['Pending', 'Accepted', 'Deleted'],
       required: true,
       default: 'Pending'
-    }
+    },
+    mutualCount: { type: Number, required: false },
+    mutualPreview: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }]
   },
   { timestamps: true }
 )

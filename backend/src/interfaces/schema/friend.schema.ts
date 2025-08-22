@@ -5,6 +5,8 @@ export interface Friend {
   userId: Types.ObjectId
   friendId: Types.ObjectId
   status: 'Pending' | 'Accepted' | 'Deleted'
+  mutualCount: number
+  mutualPreview: Types.ObjectId[]
   createdAt?: Date
   updatedAt?: Date
 }
