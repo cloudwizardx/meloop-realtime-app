@@ -14,7 +14,7 @@ export const FriendPage = () => {
     const fetchFriendRequests = async () => {
       try {
         const res = await friendService.getFriendRequestsList();
-        res.sort((x) => x.createdAt.getTime()).reverse();
+        res.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         setFriendRequests(res);
       } catch (error) {
         console.log(error);
@@ -45,7 +45,7 @@ export const FriendPage = () => {
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       {/* Friend Requests Section */}
       <div>
-        <FriendSideBar friendRequests={friendRequests}/>
+        <FriendSideBar friendRequests={friendRequests} />
       </div>
       <section className="mb-8">
         <div className="flex items-center justify-between mb-6">

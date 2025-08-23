@@ -1,10 +1,15 @@
 import { BellRing, MessageCircleMore, Plus, Search } from "lucide-react";
 import meloopLogo from "../assets/meloop_horizontal_logo.png";
 import { useState, useRef, useEffect } from "react";
+import type { NotificationBox } from "../interfaces/NotificationBox";
+import { toast } from "react-toastify";
+import * as notificationService from "../apis/NotifcationService";
+import { getTimeAgo } from "../libs/CommonFunctions";
 
 export const Header = () => {
   const [showNotificationBox, setShowNotificationBox] = useState(false);
   const boxRef = useRef<HTMLDivElement | null>(null);
+  const [notifications, setNotifications] = useState<NotificationBox[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -14,6 +19,23 @@ export const Header = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res: NotificationBox[] =
+          await notificationService.getNotificationOfUser();
+        res.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        setNotifications(res);
+      } catch (error) {
+        console.log(error);
+        toast.error(
+          "Our system occurred error, Please try again some minutes!"
+        );
+      }
+    };
+    fetchNotifications();
   }, []);
 
   return (
@@ -40,7 +62,10 @@ export const Header = () => {
           </div>
 
           {/* Right - Actions */}
-          <div className="flex items-center space-x-3 shrink-0 relative" ref={boxRef}>
+          <div
+            className="flex items-center space-x-3 shrink-0 relative"
+            ref={boxRef}
+          >
             <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
               <Plus className="w-5 h-5 text-gray-600" />
             </button>
@@ -63,12 +88,27 @@ export const Header = () => {
                   Notifications
                 </div>
                 <ul className="divide-y divide-gray-100">
-                  {notifications.map((noti, idx) => (
+                  {notifications.map((item) => (
                     <li
-                      key={idx}
-                      className="p-3 hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+                      key={item._id}
+                      className="flex items-start gap-3 p-3 hover:bg-gray-50 cursor-pointer transition"
                     >
-                      {noti}
+                      {/* Avatar */}
+                      <img
+                        className="rounded-full w-10 h-10 shrink-0"
+                        src={item.sender.profile.avatar}
+                        alt="avatar"
+                      />
+
+                      {/* Nội dung */}
+                      <div className="flex flex-col">
+                        <span className="text-sm text-gray-800 leading-snug">
+                          {item.content.text}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-0.5">
+                          {getTimeAgo(item.createdAt)}
+                        </span>
+                      </div>
                     </li>
                   ))}
                 </ul>
