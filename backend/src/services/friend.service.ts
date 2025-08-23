@@ -207,7 +207,7 @@ export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]
   return res
 }
 
-export const getFriendSuggestion = async (user: User) => {
+export const getFriendSuggestion = async (user: User): Promise<UserPopulated[]> => {
   return await userModel
     .find({ _id: { $ne: user._id } })
     .select('--password')

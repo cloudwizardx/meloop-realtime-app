@@ -25,4 +25,6 @@ router.get('/request', protectRoute, requirePermission('view_my_friend_request')
 
 router.get('/list', protectRoute, friendController.getListFriends)
 
+router.get('/suggest', protectRoute, friendController.getFriendSuggestionList)
+
 export default router
