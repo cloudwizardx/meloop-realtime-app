@@ -11,20 +11,18 @@ import {
   MessageSquareText,
   Send,
 } from "lucide-react";
-import { Header } from "../components/Header";
-import { SideBar } from "../components/LeftSidebar";
+import type { UserPopulated } from "../interfaces/UserPopulated"
+import { convertFullName } from "../libs/CommonFunctions";
 
-export const VisitUserProfilePage = () => {
+interface VisitUserProfilePageProps {
+  user: UserPopulated | null
+}
+
+export const VisitUserProfilePage = ({ user }: VisitUserProfilePageProps) => {
   return (
     <div className="min-h-full bg-gray-50">
-      {/* Header */}
-      <Header />
-
-      {/* Sidebar */}
       <div className="pt-16 max-w-7xl mx-auto px-4">
-        <div className="flex ">
-          <SideBar />
-
+        <div className="">
           {/* Main Content */}
           <main className="ml-65 max-w-full mx-auto">
             <div className="flex gap-8 p-4">
@@ -35,7 +33,7 @@ export const VisitUserProfilePage = () => {
                   {/* Cover Photo */}
                   <div className="relative h-95 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
                     <img
-                      src="https://thuvienanime.net/wp-content/uploads/2025/07/van-tham-bat-tri-mong-veiled-dreams-thuvienanime-17.jpg"
+                      src={user?.profile.coverPhoto}
                       alt="Cover"
                       className="w-full h-full object-cover"
                     />
@@ -53,8 +51,8 @@ export const VisitUserProfilePage = () => {
                         <div className="relative">
                           <div className="w-32 h-32 bg-white rounded-full p-1 shadow-lg">
                             <img
-                              src="https://anhnail.com/wp-content/uploads/2024/10/Anh-gai-xinh-sieu-cute-de-thuong.jpg"
-                              alt="Monroe Parker"
+                              src={user?.profile.avatar}
+                              alt={user?.profile._id}
                               className="w-full h-full rounded-full object-cover"
                             />
                           </div>
@@ -62,10 +60,10 @@ export const VisitUserProfilePage = () => {
                         </div>
                         <div className="pb-2">
                           <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                            Monroe Parker
+                            {convertFullName(user?.profile??null)}
                           </h1>
                           <p className="text-gray-600 mb-2">
-                            Digital Marketing Specialist
+                            {user?.profile.nickName}
                           </p>
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
@@ -375,7 +373,7 @@ export const VisitUserProfilePage = () => {
                           </h2>
                           <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-1">
                             <Eye className="w-4 h-4" />
-                            View all
+                            View All
                           </button>
                         </div>
 

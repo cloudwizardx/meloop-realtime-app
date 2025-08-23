@@ -14,8 +14,13 @@ import {
   SquarePen,
 } from "lucide-react"
 import { Header } from "../components/Header"
+import type { UserPopulated } from "../interfaces/UserPopulated"
 
-export const ProfilePage = () => {
+interface ProfilePageProps {
+  user: UserPopulated
+}
+
+export const ProfilePage = ({user}: ProfilePageProps) => {
   return (
     <div className="min-w-full max-h-full bg-gray-50">
       {/* Header */}

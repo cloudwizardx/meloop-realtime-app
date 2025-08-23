@@ -3,6 +3,7 @@ import { UserPopulated } from '../schema/user.schema'
 
 export interface FriendRequest {
   sender: UserPopulated
+  createdAt: Date | null
   mutualCount: number
   mutualPreview: {
     userId: Types.ObjectId
