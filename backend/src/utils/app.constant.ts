@@ -58,7 +58,9 @@ export const USER_PERMISSIONS = {
   BIRTHDAY_NOTIFICATIONS: 'birthday_notifications',
 
   UPLOAD_PHOTO_PROFILE: 'upload_photo_profile',
-  UPDATE_CONTACT_INFO: 'update_contact_profile'
+  UPDATE_CONTACT_INFO: 'update_contact_profile',
+
+  VIEW_MY_NOTIFICATIONS: 'view_my_notifications'
 }
 
 export const FROM_EMAIL_SENDER = 'Meloop'
