@@ -90,7 +90,7 @@ export const getInvitationList = async (req: Request, res: Response, next: NextF
 
     const result = await friendServices.getFriendRequestsList(req.user)
     res.status(200).json({
-      data: result
+      result
     })
   } catch (error) {
     console.log(error)

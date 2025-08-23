@@ -1,5 +1,5 @@
 import axios from "axios"
-import { clearAuth, getAccessToken, refreshToken } from "../services/TokenService"
+import { clearAuth, getAccessToken, refreshToken } from "../apis/TokenService"
 
 export const axiosInstance = axios.create({
     baseURL: 'http://localhost:5001/api/v1',
