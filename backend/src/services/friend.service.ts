@@ -198,9 +198,7 @@ export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]
     }))
 
     res.push({
-      sender: {
-        user: loadFriend!
-      },
+      sender: loadFriend!,
       mutualCount: mutualList.length,
       mutualPreview: mutualPreviewList
     })

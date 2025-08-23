@@ -1,7 +1,24 @@
+import { useEffect, useState } from 'react'
 import { FriendSideBar } from '../components/FriendSideBar'
-export const FriendPage = () => {
+import type { FriendRequest } from '../interfaces/FriendRequest'
+import { toast } from 'react-toastify'
+import * as friendService from '../apis/FriendService'
 
-  // user - profile/ list user common
+export const FriendPage = () => {
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([])
+
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      try {
+        const res = await friendService.getFriendRequestsList()
+        setFriendRequests(res)
+      } catch(error) {
+        console.log(error)
+        toast.error('Our system occurred error, Please try again after some minutes!')
+      }
+    }
+    fetchFriendRequests()
+  }, [])
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -16,9 +33,9 @@ export const FriendPage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((index) => (
+          {friendRequests.map((item) => (
             <div
-              key={index}
+              key={item.sender._id}
               className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
             >
               <div className="p-4">

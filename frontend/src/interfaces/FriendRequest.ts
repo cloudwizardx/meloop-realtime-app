@@ -1,9 +1,7 @@
 import type { UserPopulated } from "./UserPopulated"
 
 export interface FriendRequest {
-  sender: {
-    user: UserPopulated
-  }
+  sender: UserPopulated
   mutualCount: number
   mutualPreview: {
     userId: string
