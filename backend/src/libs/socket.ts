@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Types } from 'mongoose'
 import { Server, Socket } from 'socket.io'
 import z from 'zod'
@@ -27,7 +28,6 @@ export const initSocket = async (io: Server) => {
       const payload: PayloadVerified = (await verifyToken(token)) as PayloadVerified
       socket.data.userId = payload.userId
       next()
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return next(new UnauthorizeException('Invalid token'))
     }
