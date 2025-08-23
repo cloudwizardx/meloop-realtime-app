@@ -97,3 +97,19 @@ export const getInvitationList = async (req: Request, res: Response, next: NextF
     next(error)
   }
 }
+
+export const getFriendSuggestionList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      throw new UnauthorizeException('Unauthorize to access!')
+    }
+
+    const result = await friendServices.getFriendSuggestion(req.user)
+    res.status(200).json({
+      result
+    })
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}

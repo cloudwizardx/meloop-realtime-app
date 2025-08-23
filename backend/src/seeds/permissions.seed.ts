@@ -11,12 +11,12 @@ async function connectDB() {
 async function seedRolePermissions() {
   const permissionRoleUserLevelNormal = {
     role: 'User',
-    level: 'Normal',
+    levelMember: 'Normal',
     permissions: Object.values(USER_PERMISSIONS)
   }
 
   await UserPermissionModel.updateOne(
-    { role: permissionRoleUserLevelNormal.role, level: permissionRoleUserLevelNormal.level },
+    { role: permissionRoleUserLevelNormal.role, levelMember: permissionRoleUserLevelNormal.levelMember },
     { $set: { permissions: permissionRoleUserLevelNormal.permissions } },
     { upsert: true }
   )

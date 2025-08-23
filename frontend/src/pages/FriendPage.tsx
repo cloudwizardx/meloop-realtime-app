@@ -3,6 +3,7 @@ import { FriendSideBar } from '../components/FriendSideBar'
 import type { FriendRequest } from '../interfaces/FriendRequest'
 import { toast } from 'react-toastify'
 import * as friendService from '../apis/FriendService'
+import { convertFullName } from '../libs/CommonFunctions'
 
 export const FriendPage = () => {
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([])
@@ -41,11 +42,11 @@ export const FriendPage = () => {
               <div className="p-4">
                 <div className="flex flex-col items-center text-center">
                   <img
-                    src={`/abstract-profile-avatar.png?height=80&width=80&query=profile avatar ${index}`}
+                    src={item.sender.profile.avatar}
                     alt="Profile"
                     className="w-20 h-20 rounded-full object-cover mb-3"
                   />
-                  <h3 className="font-semibold text-gray-900 mb-2">Thanh Như</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">{convertFullName(item.sender.profile)}</h3>
 
                   <div className="flex items-center mb-4">
                     <div className="flex -space-x-2 mr-2">
@@ -60,7 +61,14 @@ export const FriendPage = () => {
                         className="w-5 h-5 rounded-full border-2 border-white"
                       />
                     </div>
-                    <span className="text-sm text-gray-600">53 mutual friends</span>
+                    <div className="text-sm text-gray-600">
+                      {item.mutualPreview.map((item) => (
+                        <div key={item.profile}>
+                          <img src={item.avatar} alt="" className='rounded-full w-3 h-3'/>
+                        </div>
+                      ))}
+                      <span className='text-xs text-gray-600'>{item.mutualCount} mutual friends</span>
+                      </div>
                   </div>
 
                   <div className="flex flex-col gap-2 w-full">
@@ -85,7 +93,7 @@ export const FriendPage = () => {
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">People You May Know</h2>
-          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">See All</button>
+          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">View All</button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

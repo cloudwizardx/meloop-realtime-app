@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
-import { User } from '~/interfaces/schema/user.schema'
+import { User, UserPopulated } from '~/interfaces/schema/user.schema'
 import friendModel from '~/models/database/friend.model'
 import userModel from '~/models/database/user.model'
 import notificationModel from '~/models/database/notification.model'
@@ -205,4 +205,25 @@ export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]
   }
 
   return res
+}
+
+export const getFriendSuggestion = async (user: User) => {
+  return await userModel
+    .find({ _id: { $ne: user._id } })
+    .select('--password')
+    .populate<{ profile: Profile }>('profile')
+}
+
+export async function convertFriends(user: User, friends: Friend[]): Promise<UserPopulated[]> {
+  const result: UserPopulated[] = []
+  for (const f of friends) {
+    const friendId = f.userId === user._id ? f.friendId : f.userId
+    const loadFriend = (await userModel
+      .findById(friendId)
+      .select('--password')
+      .populate<{ profile: Profile }>('profile')) as UserPopulated
+    result.push(loadFriend)
+  }
+
+  return result
 }
