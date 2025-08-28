@@ -5,11 +5,13 @@ import type { NotificationBox } from "../interfaces/NotificationBox";
 import { toast } from "react-toastify";
 import * as notificationService from "../apis/NotifcationService";
 import { getTimeAgo } from "../libs/CommonFunctions";
+import { useAuthStore } from "../stores/AuthStore";
 
 export const Header = () => {
   const [showNotificationBox, setShowNotificationBox] = useState(false);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const [notifications, setNotifications] = useState<NotificationBox[]>([]);
+  const authProfile = useAuthStore.getState().authProfile
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -124,7 +126,7 @@ export const Header = () => {
 
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-500 cursor-pointer">
               <img
-                src="https://avatar.iran.liara.run/public/21"
+                src={authProfile?.avatar}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />

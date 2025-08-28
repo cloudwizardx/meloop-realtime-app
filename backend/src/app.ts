@@ -9,9 +9,12 @@ import http from 'http'
 import { Server } from 'socket.io'
 import { initSocket } from '~/libs/socket'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 const app = express()
+
 app.use(express.json())
+app.use(cookieParser())
 app.use(
   cors({
     origin: process.env.FRONTEND_PATH ?? 'http://localhost:5173',

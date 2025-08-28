@@ -37,6 +37,32 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
     }
   }
 
+  const myFriends = await friendModel.find({
+    $or: [{ userId: currentUser._id }, { friendId: currentUser._id }],
+    status: 'Accepted'
+  })
+
+  const myFriendIds = myFriends.map((f) => (f.userId.equals(currentUser._id) ? f.friendId : f.userId))
+
+  await redisClient.sAdd(
+    `friends:${currentUser._id}`,
+    myFriendIds.map((id) => id.toString())
+  )
+
+  const senderFriends = await friendModel.find({
+    $or: [{ userId: receiverId }, { friendId: receiverId }],
+    status: 'Accepted'
+  })
+
+  const senderFriendsIds = senderFriends.map((f) => (f.userId.equals(receiverId) ? f.friendId : f.userId))
+
+  await redisClient.sAdd(
+    `friends:${receiverId}`,
+    senderFriendsIds.map((id) => id.toString())
+  )
+
+  const intersec = await redisClient.sInter([`friends:${currentUser._id}`, `friends:${receiverId}`])
+
   const pendingInvite = await friendModel.findOne({
     userId: currentUser._id,
     friendId: receiver._id,
@@ -53,6 +79,7 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   const friends = await friendModel.create({
     userId: currentUser._id,
     friendId: receiver._id,
+    mutualCount: intersec.length,
     status: 'Pending'
   })
 
@@ -95,13 +122,6 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
     return {
       status: false,
       message: 'Friend invitation not exist!'
-    }
-  }
-
-  if (!status.match(/^(Accepted|Deleted)$/)) {
-    return {
-      status: false,
-      message: 'Status to update invalid!'
     }
   }
 

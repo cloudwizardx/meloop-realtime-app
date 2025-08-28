@@ -7,5 +7,6 @@ router.post('/register', authController.register)
 router.post('/login', authController.login)
 router.get('/verify', authController.verifyEmailUser)
 router.post('/refresh', authController.refresh)
+router.post('/check', authController.authCheck)
 
 export default router

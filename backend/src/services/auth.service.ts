@@ -5,12 +5,11 @@ import UserModel from '~/models/database/user.model'
 import RefreshTokenModel from '~/models/database/refresh.token.model'
 import { AVATAR_DEFAULT, COVER_PHOTO_DEFAULT } from '~/utils/app.constant'
 import bcrypt from 'bcrypt'
-import { LoginRequest } from '~/interfaces/auth/login.request'
 import { InvalidCredentialException } from '~/exceptions/invalid.credential'
 import { UnverifiedEmail } from '~/exceptions/account.not.verify.email.exception'
 import { AccountBlockedException } from '~/exceptions/account.blocked.exception'
 import { signAccessToken, signRefreshToken, verifyToken } from '~/utils/jwt.utils'
-import { ClaimsPayload, PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
+import { PayloadSchema } from '~/interfaces/auth/claims.payload.interface'
 import z from 'zod'
 import { parseExpiration } from '~/utils/common.function'
 import { Types } from 'mongoose'
@@ -18,6 +17,9 @@ import { ExpiredTokenException } from '~/exceptions/expired.token.exception'
 import jwt from 'jsonwebtoken'
 import profileModel from '~/models/database/profile.model'
 import userModel from '~/models/database/user.model'
+import { User } from '~/interfaces/schema/user.schema'
+import refreshTokenModel from '~/models/database/refresh.token.model'
+import { UnauthorizeException } from '~/exceptions/unauthorized.exception'
 
 export const registerNewUser = async (body: RegisterRequest) => {
   const existingUser = await UserModel.findOne({ email: body.email })
@@ -84,7 +86,7 @@ export const loginWithCredentials = async (email: string, password: string) => {
     throw new AccountBlockedException(`User with email ${email} is blocked`)
   }
 
-  const isMatchedPassword = await bcrypt.compareSync(password, loadedUser.password)
+  const isMatchedPassword = bcrypt.compareSync(password, loadedUser.password ?? '')
   if (!isMatchedPassword) {
     throw new InvalidCredentialException()
   }
@@ -157,6 +159,32 @@ export const refreshToken = async ({ asToken, rfToken }: RefreshTokenParams) => 
   } else {
     throw new ExpiredTokenException('Refresh token expired time! Please, login again')
   }
+}
+
+export const checkAndReturnNewAccessToken = async (rfToken: string) => {
+  const refreshToken = (await refreshTokenModel.findOne({ token: rfToken }).populate<{ userId: User }>('userId')) as any
+  if (!refreshToken) {
+    throw new UnauthorizeException('Unauthorize to access this functions!')
+  }
+
+  if (refreshToken.expiresIn < new Date()) {
+    throw new ExpiredTokenException('Refresh token expired time! Please, login again')
+  }
+
+  const accessToken = signAccessToken({
+    userId: refreshToken.userId._id?.toString() ?? '',
+    levelMember: refreshToken.userId.levelMember,
+    role: refreshToken.userId.role
+  })
+
+  return {
+    accessToken
+  }
+}
+export interface ClaimsPayload {
+  userId: string
+  levelMember: string
+  role: string
 }
 
 interface ClearAndCreateRefreshTokenParams {

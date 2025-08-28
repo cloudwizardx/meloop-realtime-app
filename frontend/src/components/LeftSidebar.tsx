@@ -1,13 +1,15 @@
 import { Cake, FolderHeart, Library, Link, Play, UserRound, UsersRound, UserX } from "lucide-react";
 import type { Profile } from "../interfaces/Profile";
 import { convertFullName } from "../libs/CommonFunctions";
+import { useNavigate } from "react-router-dom";
 
 interface SideBarProps {
   profile: Profile | null
 }
 
 export const LeftSideBar = ({ profile }: SideBarProps) => {
-  
+  const navigate = useNavigate()
+
   return (
     <div>
       <aside className="w-80 fixed left-4 top-20 h-[calc(100vh-5rem)] overflow-y-auto scrollbar-hide">
@@ -43,14 +45,14 @@ export const LeftSideBar = ({ profile }: SideBarProps) => {
               { icon: UserX, label: "Black List", path: '/black-users', color: "text-gray-600" },
               { icon: Cake, label: "Birth days", path: '/friends/birth-days', color: "text-yellow-600" },
             ].map((item, index) => (
-              <Link
+              <div
                 key={index}
-                to={item.path}
+                onClick={() => navigate(item.path??'/')}
                 className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
               >
                 <item.icon className={`w-5 h-5 ${item.color}`} />
                 <span className="text-gray-700 font-medium">{item.label}</span>
-              </Link>
+              </div>
             ))}
           </nav>
         </div>
