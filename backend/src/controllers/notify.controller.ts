@@ -10,7 +10,7 @@ export const getNotificationsListOfUser = async (req: Request, res: Response, ne
 
     const result = await notificationService.getNotificationsOfUser(req.user)
     res.status(200).json({
-      result
+      data: result
     })
   } catch (error) {
     console.log(error)

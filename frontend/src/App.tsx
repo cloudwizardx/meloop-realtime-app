@@ -1,13 +1,13 @@
-import { Route, Routes } from "react-router-dom"
-import { HomePage } from "./pages/HomePage"
-import { LoginPage } from "./pages/LoginPage"
-import { ProtectedRoute } from "./routes/ProtectRoute"
-import { PostPage } from "./pages/PostPage"
-import { FriendPage } from "./pages/FriendPage"
-import { FriendRequestPage } from "./pages/FriendRequestPage"
+import { Route, Routes } from "react-router-dom";
+import { HomePage } from "./pages/HomePage";
+import { LoginPage } from "./pages/LoginPage";
+import { ProtectedRoute } from "./routes/ProtectRoute";
+import { PostPage } from "./pages/PostPage";
+import { FriendPage } from "./pages/friends/FriendPage";
+import { FriendRequestPage } from "./pages/friends/FriendRequestPage";
+import { FriendSuggestionPage } from "./pages/friends/FriendSuggestionPage";
 
 function App() {
-
   return (
     <Routes>
       <Route
@@ -18,15 +18,16 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<PostPage/>}/>
-        <Route path='friends' element={<FriendPage/>}>
-          <Route path='invitation' element={<FriendRequestPage/>}/>
-          <Route path='suggestion'/>
-        </Route>
+        <Route index element={<PostPage />} />
+        <Route path="friends" element={<FriendPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute/>}>
+        <Route path="/friends/invitation" element={<FriendRequestPage />} />
+        <Route path="/friends/suggestion" element={<FriendSuggestionPage />} />
+      </Route>
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

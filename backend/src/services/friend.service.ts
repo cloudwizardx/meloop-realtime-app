@@ -179,60 +179,63 @@ export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]
     .lean()
 
   const myFriendIds = myFriends.map((f) => (f.userId.equals(user._id) ? f.friendId : f.userId))
+  const myFriendIdsStr = myFriendIds.map((id) => id.toString())
 
-  await redisClient.sAdd(
-    `friends:${user._id}`,
-    myFriendIds.map((id) => id.toString())
-  )
+  if (myFriendIdsStr.length > 0) {
+    await redisClient.sAdd(`friends:${user._id}`, myFriendIdsStr)
+  }
 
-  const res: FriendRequest[] = []
+  const result: FriendRequest[] = []
 
   for (const request of friendRequests) {
     const friendId = request.userId.equals(user._id) ? request.friendId : request.userId
+
     const loadFriend = await userModel.findById(friendId).select('-password').populate<{ profile: Profile }>('profile')
+    if (!loadFriend) continue
+
     const loadFriends = await friendModel
       .find({ $or: [{ userId: friendId }, { friendId: friendId }], status: 'Accepted' })
       .lean()
 
     const friendIds = loadFriends.map((f) => (f.userId.equals(friendId) ? f.friendId : f.userId))
-    await redisClient.sAdd(
-      `friends:${friendId}`,
-      friendIds.map((id) => id.toString())
-    )
+    const friendIdsStr = friendIds.map((id) => id.toString())
+
+    if (friendIdsStr.length > 0) {
+      await redisClient.sAdd(`friends:${friendId}`, friendIdsStr)
+    }
 
     const mutualList: string[] = await redisClient.sInter([`friends:${user._id}`, `friends:${friendId}`])
     const previewIds = mutualList.slice(-3).map((x) => new Types.ObjectId(x))
-    const mutualPreview = await userModel
+    const mutualPreviewDocs = await userModel
       .find({ _id: { $in: previewIds } })
       .select('_id profile')
       .populate<{ profile: Pick<Profile, '_id' | 'avatar'> }>('profile')
 
-    const mutualPreviewList: {
-      userId: Types.ObjectId
-      profile: Types.ObjectId | undefined
-      avatar: string
-    }[] = mutualPreview.map((x) => ({
+    const mutualPreview = mutualPreviewDocs.map((x) => ({
       userId: x._id,
       profile: x.profile._id,
       avatar: x.profile.avatar
     }))
 
-    res.push({
-      sender: loadFriend!,
+    result.push({
+      sender: loadFriend,
       createdAt: request.createdAt ?? null,
       mutualCount: mutualList.length,
-      mutualPreview: mutualPreviewList
+      mutualPreview
     })
   }
 
-  return res
+  return result
 }
 
 export const getFriendSuggestion = async (user: User): Promise<UserPopulated[]> => {
-  return await userModel
-    .find({ _id: { $ne: user._id } })
-    .select('--password')
-    .populate<{ profile: Profile }>('profile')
+  const res =
+    (await userModel
+      .find({ _id: { $ne: user._id } })
+      .select('-password')
+      .populate<{ profile: Profile }>('profile')) ?? []
+
+  return res
 }
 
 export async function convertFriends(user: User, friends: Friend[]): Promise<UserPopulated[]> {
@@ -241,7 +244,7 @@ export async function convertFriends(user: User, friends: Friend[]): Promise<Use
     const friendId = f.userId === user._id ? f.friendId : f.userId
     const loadFriend = (await userModel
       .findById(friendId)
-      .select('--password')
+      .select('-password')
       .populate<{ profile: Profile }>('profile')) as UserPopulated
     result.push(loadFriend)
   }

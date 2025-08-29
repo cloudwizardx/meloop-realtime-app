@@ -28,7 +28,7 @@ export const sendVerificationEmail = async (email: string) => {
 }
 
 export function generateVerificationEmail(token: string) {
-  const verifyUrl = `http://localhost:5001/api/auth/verify?token=${token}`
+  const verifyUrl = `http://localhost:5001/api/v1/auth/verify?token=${token}`
 
   return `
   <!DOCTYPE html>

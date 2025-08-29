@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import { checkAndReturnNewAccessToken, loginWithCredentials, refreshToken, registerNewUser, verifyEmail } from '~/services/auth.service'
+import {
+  checkAndReturnNewAccessToken,
+  loginWithCredentials,
+  refreshToken,
+  registerNewUser,
+  verifyEmail
+} from '~/services/auth.service'
 import { parseExpiration } from '~/utils/common.function'
 import { sendVerificationEmail } from '~/utils/email.utils'
 
@@ -83,7 +89,7 @@ export const authCheck = async (req: Request, res: Response, next: NextFunction)
       user: user,
       profile: profile
     })
-  } catch(error){
+  } catch (error) {
     console.log(error)
     next(error)
   }

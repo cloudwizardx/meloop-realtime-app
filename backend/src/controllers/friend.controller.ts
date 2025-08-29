@@ -18,7 +18,7 @@ export const sendFriendInvitation = async (req: Request, res: Response, next: Ne
       if (result.data?.receiverId) {
         io.to(result.data.receiverId).emit('receiveFriendInvitation', result.data.sender)
       }
-      return res.status(200).json({ message: 'Invitation sent successfully' })
+      res.status(200).json({ message: 'Invitation sent successfully' })
     } else {
       res.status(400).json({ message: 'Fail to send invitation' })
     }
@@ -58,9 +58,9 @@ export const deletedFriendInvitation = async (req: Request, res: Response, next:
 
     const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), 'Deleted')
     if (result.status) {
-      return res.status(201).json({ message: result.message })
+      res.status(201).json({ message: result.message })
     } else {
-      return res.status(400).json({ message: result.message })
+      res.status(400).json({ message: result.message })
     }
   } catch (error) {
     console.log(error)
@@ -90,7 +90,7 @@ export const getInvitationList = async (req: Request, res: Response, next: NextF
 
     const result = await friendServices.getFriendRequestsList(req.user)
     res.status(200).json({
-      result
+      data: result
     })
   } catch (error) {
     console.log(error)
@@ -106,7 +106,7 @@ export const getFriendSuggestionList = async (req: Request, res: Response, next:
 
     const result = await friendServices.getFriendSuggestion(req.user)
     res.status(200).json({
-      result
+      data: result
     })
   } catch (error) {
     console.log(error)

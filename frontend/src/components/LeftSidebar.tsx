@@ -27,11 +27,11 @@ export const LeftSideBar = ({ profile }: SideBarProps) => {
           {/* Navigation Menu */}
           <nav className="space-y-1">
             {[
-              { icon: UserRound, label: "Friends", color: "text-blue-600" },
+              { icon: UserRound, label: "Friends", color: "text-blue-600", path: 'friends', },
               {
                 icon: UsersRound,
                 label: "Groups",
-                path: '/friends',
+                path: 'groups',
                 color: "text-green-600",
               },
               { icon: Library, label: "Pages", path: '/pages', color: "text-purple-600" },
@@ -39,7 +39,7 @@ export const LeftSideBar = ({ profile }: SideBarProps) => {
               {
                 icon: FolderHeart,
                 label: "Favorites",
-                path: '/favorites',
+                path: 'favorites',
                 color: "text-pink-600",
               },
               { icon: UserX, label: "Black List", path: '/black-users', color: "text-gray-600" },

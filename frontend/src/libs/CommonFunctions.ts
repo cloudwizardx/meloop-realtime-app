@@ -60,3 +60,7 @@ export function getTimeAgo(createdAt: Date): string {
   
   return "Done with"
 }
+
+export function getAmountLength(l: number): string {
+  return l >= 99 ? '99+': l.toString()
+}

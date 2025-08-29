@@ -2,9 +2,8 @@ import { BellRing, MessageCircleMore, Plus, Search } from "lucide-react";
 import meloopLogo from "../assets/meloop_horizontal_logo.png";
 import { useState, useRef, useEffect } from "react";
 import type { NotificationBox } from "../interfaces/NotificationBox";
-import { toast } from "react-toastify";
-import * as notificationService from "../apis/NotifcationService";
-import { getTimeAgo } from "../libs/CommonFunctions";
+import * as notificationService from "../apis/NotificationService";
+import { getAmountLength, getTimeAgo } from "../libs/CommonFunctions";
 import { useAuthStore } from "../stores/AuthStore";
 
 export const Header = () => {
@@ -32,9 +31,9 @@ export const Header = () => {
         setNotifications(res);
       } catch (error) {
         console.log(error);
-        toast.error(
-          "Our system occurred error, Please try again some minutes!"
-        );
+        // toast.error(
+        //   "Our system occurred error, Please try again some minutes!"
+        // );
       }
     };
     fetchNotifications();
@@ -79,7 +78,7 @@ export const Header = () => {
             >
               <BellRing className="w-5 h-5 text-gray-600" />
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center shadow">
-                {notifications.length}
+                {getAmountLength(notifications.length)}
               </span>
             </button>
 
@@ -120,7 +119,7 @@ export const Header = () => {
             <button className="relative p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition">
               <MessageCircleMore className="w-5 h-5 text-gray-600" />
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs font-medium rounded-full flex items-center justify-center shadow">
-                5
+                0
               </span>
             </button>
 

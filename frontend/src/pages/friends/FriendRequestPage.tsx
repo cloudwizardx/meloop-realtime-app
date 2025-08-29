@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import type { FriendRequest } from "../interfaces/FriendRequest";
+import type { FriendRequest } from "../../interfaces/FriendRequest";
 import { useQuery } from "@tanstack/react-query";
-import { useAuthStore } from "../stores/AuthStore";
-import * as friendService from "../apis/FriendService";
-import { convertFullName } from "../libs/CommonFunctions";
+import { useAuthStore } from "../../stores/AuthStore";
+import * as friendService from "../../apis/FriendService";
+import { convertFullName } from "../../libs/CommonFunctions";
 import { useState } from "react";
-import type { UserPopulated } from "../interfaces/UserPopulated";
-import { VisitUserProfilePage } from './VisitUserProfilePage';
+import type { UserPopulated } from "../../interfaces/UserPopulated";
+import { VisitUserProfilePage } from '../VisitUserProfilePage';
 
 export const FriendRequestPage = () => {
   const location = useLocation();

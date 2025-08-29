@@ -5,10 +5,10 @@ import { axiosInstance } from "../libs/Axios"
 
 export const getFriendRequestsList = async (): Promise<FriendRequest[]> => {
     const res = await axiosInstance.get('/friends/request')
-    return res.data as FriendRequest[]
+    return res.data.data as FriendRequest[]
 }
 
 export const getFriendSuggestList = async (): Promise<UserPopulated[]> => {
     const res = await axiosInstance.get('/friends/suggest')
-    return res.data
-}
+    return res.data.data as UserPopulated[]
+}   
