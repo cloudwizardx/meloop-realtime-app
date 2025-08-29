@@ -4,6 +4,7 @@ import type { AuthState } from '../interfaces/AuthState'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { toast } from 'react-toastify'
 import { axiosInstance } from '../libs/Axios'
+import { connectSocket } from '../libs/Socket'
 
 
 export const useAuthStore = create<AuthState>()(
@@ -15,6 +16,8 @@ export const useAuthStore = create<AuthState>()(
         isCheckingAuth: false,
         isRefreshingToken: false,
         isAuthenticated: false,
+        onlineUsers: [],
+        socket: null,
         error: null,
 
         setAccessToken: (token: string | null) => {
@@ -24,6 +27,10 @@ export const useAuthStore = create<AuthState>()(
             } else {
                 delete axiosInstance.defaults.headers.common['Authorization']
             }
+        },
+
+        setOnlineUsers: (target: string[]) => {
+            set({ onlineUsers: target })
         },
 
         clearError: () => {
@@ -76,13 +83,15 @@ export const useAuthStore = create<AuthState>()(
         login: async (data) => {
             set({ isLoggingIn: true, error: null })
             try {
-                const res = await axiosInstance.post('/auth/login', {
-                    data
-                })
+                const res = await axiosInstance.post('/auth/login', data
+                )
 
                 const { accessToken, isAuthenticated, user, profile } = res.data
                 get().setAccessToken(accessToken)
                 set({ isAuthenticated: isAuthenticated, authUser: user, authProfile: profile })
+                const socket = connectSocket(accessToken) as any
+                set({ isAuthenticated: isAuthenticated, authUser: user, authProfile: profile, socket: socket })
+
                 return isAuthenticated
             } catch (error: any) {
                 const message = error.response?.data?.message || 'Login failed'
@@ -95,6 +104,11 @@ export const useAuthStore = create<AuthState>()(
             try {
                 await axiosInstance.post('/auth/logout')
                 get().clearAuth()
+                if (get().socket) {
+                    get().socket?.disconnect()
+                    set({ socket: null })
+                }
+
                 toast.success('Logged out successfully')
             } catch (error: any) {
                 toast.error(error.response?.data?.message || 'Logout failed')

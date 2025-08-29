@@ -1,3 +1,4 @@
+import type { Socket } from "socket.io-client";
 import type { Profile } from "./Profile";
 import type { User } from "./User";
 
@@ -10,9 +11,12 @@ export interface AuthState {
   isCheckingAuth: boolean
   isRefreshingToken: boolean
   isAuthenticated: boolean
+  onlineUsers: string[]
+  socket: Socket | null
   error: string | null
 
   setAccessToken: (token: string | null) => void
+  setOnlineUsers: (onlineUsers: string[]) => void
   checkAuth: () => Promise<boolean>
   login: (data: any) => Promise<void>
   logout: () => Promise<void>

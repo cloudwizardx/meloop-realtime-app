@@ -39,12 +39,14 @@ export const initSocket = async (io: Server) => {
     socket.join(userId)
 
     const friends: Friend[] = await getMyFriends(new Types.ObjectId(userId))
-    const onlineFriends: Record<string, string[]> = {}
+    const onlineFriends: string[] = [] // Record<string, string[]>
 
     for (const friend of friends) {
       const friendId = friend.userId.toString() === userId ? friend.friendId.toString() : friend.userId.toString()
       const sockets = await io.in(friendId).fetchSockets()
-      onlineFriends[friendId] = sockets.map((f) => f.id)
+      if (sockets.length > 0) {
+        onlineFriends.push(friendId)
+      }
     }
 
     io.emit('getOnlineUsers', onlineFriends)
@@ -55,11 +57,13 @@ export const initSocket = async (io: Server) => {
       const sockets = await io.in(userId).fetchSockets()
       if (sockets.length === 0) {
         const friendsAfterDisconnect: Friend[] = await getMyFriends(new Types.ObjectId(userId))
-        const updatedOnlineFriends: Record<string, string[]> = {}
+        const updatedOnlineFriends: string[] = [] // Record<string, string[]>
         for (const friend of friendsAfterDisconnect) {
           const friendId = friend.userId.toString() === userId ? friend.friendId.toString() : friend.userId.toString()
           const socketsInRoom = await io.in(friendId).fetchSockets()
-          updatedOnlineFriends[friendId] = socketsInRoom.map((s) => s.id)
+          if (socketsInRoom.length > 0) {
+            updatedOnlineFriends.push(friendId)
+          }
         }
 
         io.emit('getOnlineUsers', updatedOnlineFriends)
