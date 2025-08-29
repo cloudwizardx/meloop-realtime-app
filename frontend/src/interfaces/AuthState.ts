@@ -13,7 +13,7 @@ export interface AuthState {
   error: string | null
 
   setAccessToken: (token: string | null) => void
-  checkAuth: () => Promise<void>
+  checkAuth: () => Promise<boolean>
   login: (data: any) => Promise<void>
   logout: () => Promise<void>
   refreshToken: () => Promise<void>

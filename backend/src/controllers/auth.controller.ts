@@ -75,10 +75,13 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 export const authCheck = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken = req.cookies.refreshToken as string
-    const { accessToken } = await checkAndReturnNewAccessToken(refreshToken)
+    const { accessToken, user, profile } = await checkAndReturnNewAccessToken(refreshToken)
 
     res.status(200).json({
-      ast: accessToken
+      accessToken: accessToken,
+      isAuthenticated: true,
+      user: user,
+      profile: profile
     })
   } catch(error){
     console.log(error)

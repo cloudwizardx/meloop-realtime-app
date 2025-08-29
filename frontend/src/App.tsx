@@ -7,6 +7,7 @@ import { FriendPage } from "./pages/FriendPage"
 import { FriendRequestPage } from "./pages/FriendRequestPage"
 
 function App() {
+
   return (
     <Routes>
       <Route
@@ -17,7 +18,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path='posts' index element={<PostPage/>}/>
+        <Route index element={<PostPage/>}/>
         <Route path='friends' element={<FriendPage/>}>
           <Route path='invitation' element={<FriendRequestPage/>}/>
           <Route path='suggestion'/>

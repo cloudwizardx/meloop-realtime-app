@@ -41,11 +41,12 @@ export const useAuthStore = create<AuthState>()(
         checkAuth: async () => {
             try {
                 set({ isCheckingAuth: true, error: null })
-                const res = await axiosInstance.get('/auth/check')
+                const res = await axiosInstance.post('/auth/check')
                 if (res) {
-                    const { user, accessToken } = res.data
-                    set({ authUser: user })
+                    const { user, accessToken, profile, isAuthenticated } = res.data
+                    set({ authUser: user, authProfile: profile, isAuthenticated: isAuthenticated })
                     get().setAccessToken(accessToken)
+                    return isAuthenticated
                 }
             } catch (error: any) {
                 console.log(error)

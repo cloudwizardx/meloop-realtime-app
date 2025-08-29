@@ -177,8 +177,12 @@ export const checkAndReturnNewAccessToken = async (rfToken: string) => {
     role: refreshToken.userId.role
   })
 
+  const profile = await profileModel.findById(refreshToken.userId.profile)
+
   return {
-    accessToken
+    accessToken,
+    user: refreshToken.userId,
+    profile: profile
   }
 }
 export interface ClaimsPayload {
