@@ -16,3 +16,11 @@ export const getFriendSuggestList = async (): Promise<UserPopulated[]> => {
 export const sendFriendRequest = async (receiverId: string) => {
     await axiosInstance.post(`/friends/${receiverId}/invite`) 
 }
+
+export const acceptFriendRequest = async (inviteId: string) => {
+    await axiosInstance.post(`/friends/${inviteId}/accepted`)
+}
+
+export const deletedFriendRequest = async (inviteId: string) => {
+    await axiosInstance.post(`/friends/${inviteId}/deleted`)
+}

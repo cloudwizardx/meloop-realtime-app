@@ -12,12 +12,12 @@ export const FriendPage = () => {
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [friendSuggests, setFriendSuggests] = useState<UserPopulated[]>([]);
   const [requestedIds, setRequestedIds] = useState<string[]>([]);
+  const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
       try {
         const res = await friendService.getFriendRequestsList();
-        res.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         setFriendRequests(res);
       } catch (error) {
         console.log(error);
@@ -28,6 +28,15 @@ export const FriendPage = () => {
     };
     fetchFriendRequests();
   }, []);
+
+  useEffect(() => {
+    const mapped = friendRequests.map((n) => ({
+      ...n,
+      createdAt: new Date(n.createdAt),
+    }));
+    mapped.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    setFriendRequests(mapped)
+  }, [friendRequests]);
 
   useEffect(() => {
     const fetchFriendSuggests = async () => {
@@ -59,13 +68,45 @@ export const FriendPage = () => {
     }
   };
 
+  const handleConfirmRequest = async (inviteId: string) => {
+    try {
+      await friendService.acceptFriendRequest(inviteId);
+      setConfirmedIds((prev) => [...prev, inviteId]);
+    } catch (error) {
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
+
+  const handleRefuseRequest = async (inviteId: string) => {
+    try {
+      await friendService.deletedFriendRequest(inviteId);
+      const friendRequestReset = friendRequests.filter(
+        (x) => x._id != inviteId
+      );
+      setFriendRequests(friendRequestReset);
+    } catch (error) {
+      console.log(error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div>
         <FriendSideBar friendRequests={friendRequests} />
       </div>
       <section className="mb-8">
-        <FriendRequestOnTopPage friendRequests={friendRequests} />
+        <FriendRequestOnTopPage
+          friendRequests={friendRequests}
+          confirmedIds={confirmedIds}
+          handleAcceptFriend={handleConfirmRequest}
+          handleDeleteFriend={handleRefuseRequest}
+        />
       </section>
       <div className="border-t border-gray-200 mb-8"></div>
       <section>

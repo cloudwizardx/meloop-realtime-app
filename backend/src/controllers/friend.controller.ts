@@ -36,7 +36,11 @@ export const acceptFriendInvitation = async (req: Request, res: Response, next: 
 
     const { inviteId } = req.params
 
-    const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), 'Accepted')
+    const result = await friendServices.updateStatusFriendInvitation(
+      new Types.ObjectId(inviteId),
+      req.user._id ?? new Types.ObjectId(),
+      'Accepted'
+    )
     if (result.status) {
       return res.status(201).json({ message: result.message })
     } else {
@@ -56,7 +60,11 @@ export const deletedFriendInvitation = async (req: Request, res: Response, next:
 
     const { inviteId } = req.params
 
-    const result = await friendServices.updateStatusFriendInvitation(new Types.ObjectId(inviteId), 'Deleted')
+    const result = await friendServices.updateStatusFriendInvitation(
+      new Types.ObjectId(inviteId),
+      req.user._id ?? new Types.ObjectId(),
+      'Deleted'
+    )
     if (result.status) {
       res.status(201).json({ message: result.message })
     } else {

@@ -30,7 +30,8 @@ export const Header = () => {
         const res: NotificationBox[] =
           await notificationService.getNotificationOfUser()
 
-        // convert sang Date object vì mặc định trả về từ created/updated là Date ISO nên getTime sẽ lỗi runtime trắng màn hình
+        // convert sang Date object vì mặc định trả về từ created/updated là Date ISO nên getTime 
+        // sẽ lỗi runtime trắng màn hình
         const mapped = res.map((n) => ({
           ...n,
           createdAt: new Date(n.createdAt),
@@ -62,7 +63,34 @@ export const Header = () => {
     return () => {
       socket.off("receiveFriendInvitation", handleInvitation)
     }
-  }, [useAuthStore.getState().socket])
+  }, [socket])
+
+  useEffect(() => {
+    if(!socket) return 
+
+    const handleAcceptedInvitation = (data: any) => {
+      const { notification } = data
+      setNotifications((prev) => [notification, ...prev])
+      toast.info(notification.content.text)
+    }
+
+    socket.on('acceptedInvitation', handleAcceptedInvitation)
+
+    return () => {
+      socket.off('acceptedInvitation', handleAcceptedInvitation)
+    }
+  }, [socket])
+
+  useEffect(() => {
+    const mapped = notifications.map((n) => ({
+      ...n,
+      createdAt: new Date(n.createdAt),
+      updatedAt: new Date(n.updatedAt)
+    }))
+    mapped.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    setNotifications(mapped)
+  }, [notifications])
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50">

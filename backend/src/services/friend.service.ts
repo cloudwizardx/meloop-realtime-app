@@ -262,6 +262,7 @@ export const getFriendRequestsList = async (user: User): Promise<FriendRequest[]
     }))
 
     result.push({
+      _id: request._id,
       sender: loadFriend,
       createdAt: request.createdAt ?? null,
       mutualCount: mutualList.length,
