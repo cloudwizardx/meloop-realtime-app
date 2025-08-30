@@ -5,9 +5,6 @@ import userRoutes from '~/routes/user.routes'
 import friendRoute from '~/routes/friend.routes'
 import messageRoute from '~/routes/message.routes'
 import notificationRoute from '~/routes/notify.routes'
-import http from 'http'
-import { Server } from 'socket.io'
-import { initSocket } from '~/libs/socket'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
@@ -21,16 +18,6 @@ app.use(
     credentials: true
   })
 )
-const server = http.createServer(app)
-
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_PATH ?? 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  }
-})
-initSocket(io)
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users/me', userRoutes)

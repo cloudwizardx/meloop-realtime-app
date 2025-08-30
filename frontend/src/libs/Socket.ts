@@ -10,8 +10,7 @@ export const connectSocket = (token: string) => {
 
     socket = io(url, {
         auth: { token },
-        withCredentials: true,
-        transports: ['websocket']
+        withCredentials: true
     })
 
     socket.on('getOnlineUsers', (onlineFriends) => {

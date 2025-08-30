@@ -35,7 +35,7 @@ export const initSocket = async (io: Server) => {
 
   io.on('connection', async (socket: Socket) => {
     const userId = socket.data.userId
-    console.log('User connected:', userId, socket.id)
+    // console.log('User connected:', userId, socket.id)
     socket.join(userId)
 
     const friends: Friend[] = await getMyFriends(new Types.ObjectId(userId))
@@ -49,10 +49,10 @@ export const initSocket = async (io: Server) => {
       }
     }
 
-    io.emit('getOnlineUsers', onlineFriends)
+    io.to(userId).emit('getOnlineUsers', onlineFriends)
 
     socket.on('disconnect', async () => {
-      console.log('User disconnected:', socket.id)
+      // console.log('User disconnected:', socket.id)
 
       const sockets = await io.in(userId).fetchSockets()
       if (sockets.length === 0) {

@@ -44,10 +44,12 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
 
   const myFriendIds = myFriends.map((f) => (f.userId.equals(currentUser._id) ? f.friendId : f.userId))
 
-  await redisClient.sAdd(
-    `friends:${currentUser._id}`,
-    myFriendIds.map((id) => id.toString())
-  )
+  if (myFriendIds.length > 0) {
+    await redisClient.sAdd(
+      `friends:${currentUser._id}`,
+      myFriendIds.map((id) => id.toString())
+    )
+  }
 
   const senderFriends = await friendModel.find({
     $or: [{ userId: receiverId }, { friendId: receiverId }],
@@ -56,10 +58,12 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
 
   const senderFriendsIds = senderFriends.map((f) => (f.userId.equals(receiverId) ? f.friendId : f.userId))
 
-  await redisClient.sAdd(
-    `friends:${receiverId}`,
-    senderFriendsIds.map((id) => id.toString())
-  )
+  if (senderFriendsIds.length > 0) {
+    await redisClient.sAdd(
+      `friends:${receiverId}`,
+      senderFriendsIds.map((id) => id.toString())
+    )
+  }
 
   const intersec = await redisClient.sInter([`friends:${currentUser._id}`, `friends:${receiverId}`])
 
@@ -90,7 +94,7 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
   const userName = `${currentUserProfile?.firstName} ${currentUserProfile?.lastName}`
   const notificationContent = notifyFriendInvitationContent(userName)
 
-  await notificationModel.create({
+  const notification = await notificationModel.create({
     senderId: currentUser._id,
     receiverIds: [receiverId],
     contextType: 'Friend',
@@ -102,21 +106,42 @@ export const createNewFriendInvitation = async (receiverId: Types.ObjectId, curr
     isRead: false
   })
 
+  const sender = (await userModel
+    .findById(notification.senderId)
+    .select('-password')
+    .populate<{ profile: Profile }>('profile')) as UserPopulated
+
   return {
     status: true,
-    message: 'Sent friend invitation successfully!',
     data: {
       receiverId: receiver._id.toString(),
       sender: {
         id: currentUser._id ? currentUser._id.toString() : '',
         name: userName,
         avatar: currentUserProfile?.avatar
+      },
+      notification: {
+        _id: notification._id,
+        sender: sender,
+        contextType: notification.contextType,
+        contextId: notification.contextId,
+        content: {
+          text: notification.content.text,
+          extraInfo: notification.content.extraInfo
+        },
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+        updatedAt: notification.updatedAt
       }
     }
   }
 }
 
-export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, status: string) => {
+export const updateStatusFriendInvitation = async (
+  inviteId: Types.ObjectId,
+  senderId: Types.ObjectId,
+  status: string
+) => {
   const loadedInvitation = await friendModel.findById(inviteId)
   if (!loadedInvitation) {
     return {
@@ -134,27 +159,46 @@ export const updateStatusFriendInvitation = async (inviteId: Types.ObjectId, sta
 
   await friendModel.updateOne({ _id: inviteId }, { $set: { status: status } })
   if (status === 'Accepted') {
-    const loadedSender = await userModel.findById(loadedInvitation.userId)
-    if (loadedSender?.isOnline) {
-      const io = getIo()
-      io.to(loadedSender?._id.toString()).emit('acceptedInvitation', {
-        status: true,
-        message: 'Updated status of friend invitation!'
-      })
-    }
-    const receiver = await userModel.findById(loadedInvitation.friendId)
-    const receiverProfile = await profileModel.findById(receiver?.profile)
+    const friendId = loadedInvitation.userId === senderId ? loadedInvitation.friendId : loadedInvitation.userId
+    const receiver = (await userModel
+      .findById(friendId)
+      .select('-password')
+      .populate<{ profile: Profile }>('profile')) as UserPopulated
+    const senderPopulated = (await userModel
+      .findById(senderId)
+      .select('-password')
+      .populate<{ profile: Profile }>('profile')) as UserPopulated
 
-    await notificationModel.create({
-      senderId: loadedInvitation.friendId,
-      receiverIds: [loadedInvitation.userId],
+    const notification = await notificationModel.create({
+      senderId: senderId,
+      receiverIds: [friendId],
       contextType: 'Friend',
       contextId: loadedInvitation._id,
       content: {
-        text: notifyAcceptedFriendInvitation(`${receiverProfile?.firstName} ${receiverProfile?.lastName}`),
-        extraInfo: receiverProfile?.avatar
+        text: notifyAcceptedFriendInvitation(`${receiver.profile?.firstName} ${receiver.profile?.lastName}`),
+        extraInfo: receiver.profile?.avatar
       }
     })
+
+    const data = {
+      notification: {
+        _id: notification._id,
+        sender: senderPopulated,
+        contextType: notification.contextType,
+        contextId: notification.contextId,
+        content: {
+          text: notification.content.text,
+          extraInfo: notification.content.extraInfo
+        },
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+        updatedAt: notification.updatedAt
+      }
+    }
+    if (receiver?.isOnline) {
+      const io = getIo()
+      io.to((receiver._id ?? '').toString()).emit('acceptedInvitation', data)
+    }
   }
 
   return {

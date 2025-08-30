@@ -7,11 +7,8 @@ export const getNotificationsListOfUser = async (req: Request, res: Response, ne
     if (!req.user) {
       throw new UnauthorizeException('Unauthorize to access!')
     }
-
     const result = await notificationService.getNotificationsOfUser(req.user)
-    res.status(200).json({
-      data: result
-    })
+    res.status(200).json({ result })
   } catch (error) {
     console.log(error)
     next(error)

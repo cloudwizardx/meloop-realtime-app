@@ -2,7 +2,7 @@ import type { UserPopulated } from "./UserPopulated"
 
 export interface NotificationBox {
   _id: string
-  sender: UserPopulated
+  sender: UserPopulated | null
   contextType: 'Post' | 'Comment' | 'Message' | 'Follower' | 'Page' | 'Group'
   contextId?: string
   content: {

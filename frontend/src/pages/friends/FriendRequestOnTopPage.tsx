@@ -64,10 +64,10 @@ export const FriendRequestOnTopPage = ({friendRequests}: FriendRequestOnTopPageP
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                  <button className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
                     Confirm
                   </button>
-                  <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                  <button className="cursor-pointer w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors duration-200">
                     Delete
                   </button>
                 </div>

@@ -12,3 +12,7 @@ export const getFriendSuggestList = async (): Promise<UserPopulated[]> => {
     const res = await axiosInstance.get('/friends/suggest')
     return res.data.data as UserPopulated[]
 }   
+
+export const sendFriendRequest = async (receiverId: string) => {
+    await axiosInstance.post(`/friends/${receiverId}/invite`) 
+}

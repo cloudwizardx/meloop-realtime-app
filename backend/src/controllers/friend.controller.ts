@@ -16,7 +16,7 @@ export const sendFriendInvitation = async (req: Request, res: Response, next: Ne
     if (result.status) {
       const io = getIo()
       if (result.data?.receiverId) {
-        io.to(result.data.receiverId).emit('receiveFriendInvitation', result.data.sender)
+        io.to(result.data.receiverId).emit('receiveFriendInvitation', result.data)
       }
       res.status(200).json({ message: 'Invitation sent successfully' })
     } else {

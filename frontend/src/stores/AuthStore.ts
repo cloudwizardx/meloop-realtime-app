@@ -51,7 +51,8 @@ export const useAuthStore = create<AuthState>()(
                 const res = await axiosInstance.post('/auth/check')
                 if (res) {
                     const { user, accessToken, profile, isAuthenticated } = res.data
-                    set({ authUser: user, authProfile: profile, isAuthenticated: isAuthenticated })
+                    const socket = connectSocket(accessToken)
+                    set({ authUser: user, authProfile: profile, isAuthenticated: isAuthenticated, socket: socket })
                     get().setAccessToken(accessToken)
                     return isAuthenticated
                 }
@@ -88,7 +89,6 @@ export const useAuthStore = create<AuthState>()(
 
                 const { accessToken, isAuthenticated, user, profile } = res.data
                 get().setAccessToken(accessToken)
-                set({ isAuthenticated: isAuthenticated, authUser: user, authProfile: profile })
                 const socket = connectSocket(accessToken) as any
                 set({ isAuthenticated: isAuthenticated, authUser: user, authProfile: profile, socket: socket })
 

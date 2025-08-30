@@ -1,43 +1,68 @@
-import { BellRing, MessageCircleMore, Plus, Search } from "lucide-react";
-import meloopLogo from "../assets/meloop_horizontal_logo.png";
-import { useState, useRef, useEffect } from "react";
-import type { NotificationBox } from "../interfaces/NotificationBox";
-import * as notificationService from "../apis/NotificationService";
-import { getAmountLength, getTimeAgo } from "../libs/CommonFunctions";
-import { useAuthStore } from "../stores/AuthStore";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BellRing, MessageCircleMore, Plus, Search } from "lucide-react"
+import meloopLogo from "../assets/meloop_horizontal_logo.png"
+import { useState, useRef, useEffect } from "react"
+import * as notificationService from "../apis/NotificationService"
+import { getAmountLength, getTimeAgo } from "../libs/CommonFunctions"
+import { useAuthStore } from "../stores/AuthStore"
+import { toast } from "react-toastify"
+import type { NotificationBox } from "../interfaces/NotificationBox"
 
 export const Header = () => {
-  const [showNotificationBox, setShowNotificationBox] = useState(false);
-  const boxRef = useRef<HTMLDivElement | null>(null);
-  const [notifications, setNotifications] = useState<NotificationBox[]>([]);
+  const [showNotificationBox, setShowNotificationBox] = useState(false)
+  const boxRef = useRef<HTMLDivElement | null>(null)
+  const [notifications, setNotifications] = useState<NotificationBox[]>([])
   const authProfile = useAuthStore.getState().authProfile
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (boxRef.current && !boxRef.current.contains(event.target as Node)) {
-        setShowNotificationBox(false);
+        setShowNotificationBox(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const res: NotificationBox[] =
-          await notificationService.getNotificationOfUser();
-        res.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        setNotifications(res);
+          await notificationService.getNotificationOfUser()
+
+        // convert sang Date object vì mặc định trả về từ created/updated là Date ISO nên getTime sẽ lỗi runtime trắng màn hình
+        const mapped = res.map((n) => ({
+          ...n,
+          createdAt: new Date(n.createdAt),
+          updatedAt: new Date(n.updatedAt),
+        }))
+
+        mapped.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+        setNotifications(mapped)
       } catch (error) {
-        console.log(error);
-        // toast.error(
-        //   "Our system occurred error, Please try again some minutes!"
-        // );
+        console.log(error)
       }
-    };
-    fetchNotifications();
-  }, []);
+    }
+    fetchNotifications()
+  }, [])
+
+  const socket = useAuthStore((state) => state.socket)
+  useEffect(() => {
+    if (!socket) return
+
+    const handleInvitation = (data: any) => {
+      const { sender, notification } = data
+      setNotifications((prev) => [notification, ...prev])
+      toast.info(`You have a new friend request from ${sender.name}`)
+    }
+
+    socket.on("receiveFriendInvitation", handleInvitation)
+
+    return () => {
+      socket.off("receiveFriendInvitation", handleInvitation)
+    }
+  }, [useAuthStore.getState().socket])
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50">
@@ -97,7 +122,7 @@ export const Header = () => {
                       {/* Avatar */}
                       <img
                         className="rounded-full w-10 h-10 shrink-0"
-                        src={item.sender.profile.avatar}
+                        src={item.sender?.profile.avatar}
                         alt="avatar"
                       />
 
@@ -134,5 +159,5 @@ export const Header = () => {
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
